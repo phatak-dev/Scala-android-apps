@@ -48,7 +48,10 @@ class CrimeFragment extends Fragment with Contexts
   	parent:ViewGroup,savedBundleInstance:Bundle):View = {
     val view = getUi{
     l[LinearLayout]{
-      w[EditText] <~ text("something") <~ wire(editText)
+      w[EditText] <~ text("something") <~ 
+      wire(editText) <~ 
+       layoutParams[LinearLayout](MATCH_PARENT,
+       	WRAP_CONTENT)
       }      
     }
     getUi {
