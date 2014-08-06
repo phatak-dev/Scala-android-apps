@@ -15,7 +15,7 @@ object CrimeLab{
   val crimes =  ( 1 until 100) map (i => {
       val crime = new Crime()
       crime.mTitle = "Set mTitle"+ i
-      crime.solved = i %2 == 0
+      crime.solved = (i % 2) == 0      
       crime
     }) toList 
   def getCrimes():List[Crime] = crimes
