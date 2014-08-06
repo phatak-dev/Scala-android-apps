@@ -21,6 +21,7 @@ import android.util.Log.d
 import android.content.Intent
 import android.support.v4.app._
 import java.util.UUID
+import java.util.Date
 
 // import macroid stuff
 import macroid._
@@ -31,8 +32,10 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-case class Crime(val uuid :UUID= UUID.randomUUID(),
-      var mTitle:String)   
+case class Crime(var uuid:UUID = UUID.randomUUID(),
+  var mTitle:String="",
+  var mDate:Date = new Date(),var solved:Boolean=false) 
+
 
 class CriminalActivity extends FragmentActivity with  
 Contexts[FragmentActivity] with IdGeneration {

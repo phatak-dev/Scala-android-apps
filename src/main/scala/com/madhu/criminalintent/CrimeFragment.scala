@@ -2,7 +2,7 @@ package com.madhu.criminalintent
 
 import android.os.Bundle
 import android.widget.{LinearLayout, TextView, Button,FrameLayout,
-EditText}
+EditText,CheckBox}
 import android.view.ViewGroup.LayoutParams._
 import android.view.ViewGroup
 import android.view.{Gravity, View}
@@ -30,12 +30,25 @@ import android.text.Editable
 import macroid._
 import macroid.Ui
 import macroid.FullDsl._
+import macroid.contrib.LpTweaks._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+ trait CustomTweaks {
+  def margin(width:Int,height:Int)(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0, all: Int = -1) = {
+  val layout = new LinearLayout.LayoutParams(width,height)
+  if (all >= 0) {
+    layout.setMargins(all, all, all, all)
+  } else {
+    layout.setMargins(left, top, right, bottom)
+  }
+  Tweak[View](_.setLayoutParams(layout))
+ }
+}
 
 
-class CrimeFragment extends Fragment with Contexts
+class CrimeFragment extends Fragment with CustomTweaks
+with Contexts
 [Fragment] {
   var  crime:Crime  = _
   var editText = slot[EditText]
@@ -46,12 +59,21 @@ class CrimeFragment extends Fragment with Contexts
   override def onCreateView(inflator:LayoutInflater,
   	parent:ViewGroup,savedBundleInstance:Bundle):View = {
     val view = getUi{
-    l[LinearLayout]{
+    l[LinearLayout](    
+      w[TextView] <~ text("Title") <~ 
+      matchWidth , 
       w[EditText] <~ text("something") <~ 
-      wire(editText) <~ 
-       layoutParams[LinearLayout](MATCH_PARENT,
-       	WRAP_CONTENT)
-      }      
+      wire(editText) <~ matchWidth <~ margin(MATCH_PARENT,
+        WRAP_CONTENT)(left = 16 dp , right = 16 dp),
+      w[TextView] <~ text("Details") <~
+       matchWidth ,
+      w[Button] <~ text("date") <~ margin(MATCH_PARENT,
+        WRAP_CONTENT)(left = 16 dp , right = 16 dp) ,
+      w[CheckBox] <~ text("Crime solved") <~ margin(MATCH_PARENT,
+        WRAP_CONTENT)(left = 16 dp , right = 16 dp) 
+
+      ) <~ vertical <~ matchWidth
+
     }
     getUi {
      editText.get.addTextChangedListener(
