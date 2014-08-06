@@ -10,7 +10,8 @@
     <application
         android:label="CriminalIntent" 
         android:background="@android:color/white"        
-        android:icon="@drawable/android:star_big_on">
+        android:icon="@drawable/android:star_big_on"
+        android:theme="@android:style/Theme.Holo.Light">
 
         <activity
           android:label="CriminalIntent"
