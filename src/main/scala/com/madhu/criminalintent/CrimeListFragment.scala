@@ -35,13 +35,14 @@ with Contexts
   		  w[CheckBox] <~ wire(checkBox) 
   		  <~ Tweak {
   		  	(view:View) => Ui[Boolean]{
-  		  	   val layout = new RelativeLayout.LayoutParams(
-  		  	   WRAP_CONTENT,WRAP_CONTENT)  		  		  		  	   
+  		  	   val layout = new RelativeLayout.LayoutParams(MATCH_PARENT,
+  		  	   MATCH_PARENT)
   		  	   layout.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
   		  	   view.setLayoutParams(layout)  
   		  	   false		  	   
-  		  	} 
-  		  } <~ padding(all = 4 dp) <~ id(Id.checkBox),
+  		  	}
+  		  }  <~ Tweak{ (view:CheckBox) => view.setGravity(Gravity.CENTER)} <~ 
+  		  padding(all = 4 dp) <~ id(Id.checkBox),
   		  w[TextView] <~ text("testing") <~ Tweak {
   		  	(view:View) => Ui[Boolean]{
   		  	   val layout = new RelativeLayout.LayoutParams(
@@ -67,7 +68,7 @@ with Contexts
   		  	<~ id(Id.dateText)
 
   		) <~ lp[android.widget.AbsListView](   
-        MATCH_PARENT,MATCH_PARENT) }        
+        MATCH_PARENT,WRAP_CONTENT) }        
   	 
 
     class CustomAdapter(crimes:List[Crime]) 
