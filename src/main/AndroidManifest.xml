@@ -13,13 +13,15 @@
         android:icon="@drawable/android:star_big_on"
         android:theme="@android:style/Theme.Holo.Light">
 
+        <activity android:name=".CrimeListActivity">
+        <intent-filter>
+         <action android:name="android.intent.action.MAIN" />
+           <category android:name="android.intent.category.LAUNCHER" />
+         </intent-filter>
+        </activity>
         <activity
           android:label="CriminalIntent"
-          android:name=".CriminalActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>            
+          android:name=".CriminalActivity">            
         </activity>        
     </application>
 </manifest>
