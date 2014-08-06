@@ -19,6 +19,7 @@ import macroid.contrib._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.JavaConverters._
+import android.util.Log.d
 
 
 
@@ -33,37 +34,35 @@ with Contexts
   	var checkBox = slot[CheckBox]
   	def layout = getUi{l[RelativeLayout](
   		  w[CheckBox] <~ wire(checkBox) 
-  		  <~ Tweak {
-  		  	(view:View) => Ui[Boolean]{
-  		  	   val layout = new RelativeLayout.LayoutParams(MATCH_PARENT,
+  		   <~ Tweak{ (view:CheckBox) => view.setGravity(Gravity.CENTER)} <~ 
+  		  padding(all = 4 dp) <~ id(Id.checkBox) <~ Tweak {
+  		  	(view:CheckBox) => {
+  		  	   val layoutParams = new RelativeLayout.LayoutParams(WRAP_CONTENT,
   		  	   MATCH_PARENT)
-  		  	   layout.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-  		  	   view.setLayoutParams(layout)  
-  		  	   false		  	   
+  		  	   layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)  		  	   
+  		  	   view.setLayoutParams(layoutParams)    		  	     	  		  	   
   		  	}
-  		  }  <~ Tweak{ (view:CheckBox) => view.setGravity(Gravity.CENTER)} <~ 
-  		  padding(all = 4 dp) <~ id(Id.checkBox),
-  		  w[TextView] <~ text("testing") <~ Tweak {
-  		  	(view:View) => Ui[Boolean]{
+  		  }
+  		  ,
+  		  w[TextView] <~ Tweak {
+  		  	(view:View) => {
   		  	   val layout = new RelativeLayout.LayoutParams(
   		  	   MATCH_PARENT,WRAP_CONTENT)  		  		  		  	   
   		  	   layout.addRule(RelativeLayout.LEFT_OF,
   		  	   	Id.checkBox)
-  		  	   view.setLayoutParams(layout)  
-  		  	   false		  	   
+  		  	   view.setLayoutParams(layout)    		  	   
   		  	}} <~ TextTweaks.bold <~ id(Id.crimeText) <~ 
   		  	padding ( left = 4 dp, right = 4 dp),
 
   		  	w[TextView] <~ Tweak {
-  		  	(view:View) => Ui[Boolean]{
+  		  	(view:View) => {
   		  	   val layout = new RelativeLayout.LayoutParams(
   		  	   MATCH_PARENT,WRAP_CONTENT)  		  		  		  	   
   		  	   layout.addRule(RelativeLayout.LEFT_OF,
   		  	   	Id.checkBox)
   		  	   layout.addRule(RelativeLayout.BELOW,
   		  	   	Id.crimeText)
-  		  	   view.setLayoutParams(layout)  
-  		  	   true		  	   
+  		  	   view.setLayoutParams(layout)    		  	   		  	  
   		  	}} <~ padding ( left = 4 dp, right = 4 dp , top= 4 dp)
   		  	<~ id(Id.dateText)
 
@@ -79,20 +78,16 @@ with Contexts
         else layout         	        
         val crime = getListAdapter().getItem(position).asInstanceOf[
          Crime]    
-       getUi{     
-        val textView = layoutView.find[TextView](Id.crimeText)                       
-        val dateText = layoutView.find[TextView](Id.dateText)        
-        textView <~ text(crime.mTitle)                        
-        dateText <~ text(crime.mDate.toString)                 
-       }
-       getUi {
-       	val checkBox = layoutView.find[CheckBox](Id.checkBox)
-       	checkBox <~ Tweak {(view:CheckBox) =>{
-        	view.setChecked(crime.solved) }       
-        }
-       }
+        val textView = layoutView.find[TextView](Id.crimeText)                        
+        val dateText = layoutView.find[TextView](Id.dateText)                
+        val checkBox = layoutView.find[CheckBox](Id.checkBox)
+       
+        getUi{textView <~ text(crime.mTitle)} 
+        getUi{dateText <~ text(crime.mDate.toString)} 
+        getUi{checkBox <~ Tweak {(view:CheckBox) =>{
+        	view.setChecked(crime.solved) }                       
+       }}
         layoutView                      
-
        }
       }   	    
     val customAdapter = new CustomAdapter(crimes)  	
