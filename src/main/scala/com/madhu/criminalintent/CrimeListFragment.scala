@@ -41,8 +41,8 @@ with Contexts
   		  	   MATCH_PARENT)
   		  	   layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)  		  	   
   		  	   view.setLayoutParams(layoutParams)    		  	     	  		  	   
-  		  	}
-  		  }
+  		  	} 
+  		  } <~ Tweak{(view:CheckBox) => view.setFocusable(false)}
   		  ,
   		  w[TextView] <~ Tweak {
   		  	(view:View) => {
