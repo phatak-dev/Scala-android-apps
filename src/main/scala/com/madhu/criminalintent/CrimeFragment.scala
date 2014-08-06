@@ -58,6 +58,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
     MATCH_PARENT,WRAP_CONTENT,Gravity.CENTER_VERTICAL) +    
      TextTweaks.bold + TextTweaks.size(6 sp) + 
      padding (left = 8 dp) 
+
 }
 
 
@@ -74,22 +75,42 @@ with Contexts
   }
   override def onCreateView(inflator:LayoutInflater,
   	parent:ViewGroup,savedBundleInstance:Bundle):View = {
-    val view = getUi{
-    l[LinearLayout](    
-      w[TextView] <~ text("Title") <~ 
-      matchWidth <~ listSeperator, 
-      w[EditText] <~ text("something") <~ 
+    val title = w[TextView] <~ text("Title") <~ 
+      matchWidth <~ listSeperator
+    val crimeInfo = w[EditText] <~ text("something") <~ 
       wire(editText) <~ matchWidth <~ margin(MATCH_PARENT,
-        WRAP_CONTENT)(left = 16 dp , right = 16 dp),
-      w[TextView] <~ text("Details") <~
-       matchWidth <~ listSeperator ,
-      w[Button]  <~ text(crime.mDate.toString) <~ margin(MATCH_PARENT,
-        WRAP_CONTENT)(left = 16 dp , right = 16 dp) <~ disable ,
-      w[CheckBox] <~ text("Crime solved") <~ margin(MATCH_PARENT,
-        WRAP_CONTENT)(left = 16 dp , right = 16 dp) <~ wire(checkBoxCrimeResolved)
-         
-      ) <~ vertical <~ matchWidth
+        WRAP_CONTENT)(left = 16 dp , right = 16 dp)
+    val details  = w[TextView] <~ text("Details") <~
+       matchWidth <~ listSeperator 
+    val dateButton = w[Button]  <~ text(crime.mDate.toString) <~ 
+    disable
+    val checkBox = w[CheckBox] <~ text("Crime solved") <~
+        wire(checkBoxCrimeResolved) 
 
+    val portaitLayout = getUi{
+    l[LinearLayout](    
+       title, 
+       crimeInfo,
+       details,
+      dateButton <~ margin(MATCH_PARENT,
+        WRAP_CONTENT)(left = 16 dp , right = 16 dp)  ,
+      checkBox<~ margin(MATCH_PARENT,
+        WRAP_CONTENT)(left = 16 dp , right = 16 dp) 
+      ) <~ vertical <~ matchWidth
+    }
+
+    val landscapeLayout = getUi {
+      l[LinearLayout] (
+        title,
+        crimeInfo,
+        details,
+        l[LinearLayout](
+        dateButton <~ lp[LinearLayout](0 dp,
+        WRAP_CONTENT,1.0f),
+        checkBox <~ lp[LinearLayout](0 dp,
+        WRAP_CONTENT,1.0f)        
+      ) <~ horizontal <~ matchWidth
+      ) <~ vertical <~ matchWidth 
     }
 
     /* set event listener */    
@@ -121,7 +142,7 @@ with Contexts
 
       Ui(true)	
     }
-    view       
+    if(portrait) portaitLayout else landscapeLayout       
   }
 
 
