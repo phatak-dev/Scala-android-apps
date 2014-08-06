@@ -4,11 +4,12 @@
     android:versionName="0.1">
 
     <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="18"/>            
+        android:minSdkVersion="9"
+        android:targetSdkVersion="19"/>            
 
     <application
-        android:label="CriminalIntent"
+        android:label="CriminalIntent" 
+        android:background="@android:color/white"        
         android:icon="@drawable/android:star_big_on">
 
         <activity

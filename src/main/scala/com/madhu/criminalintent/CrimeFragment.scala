@@ -28,9 +28,8 @@ import android.text.Editable
 
 // import macroid stuff
 import macroid._
-import macroid.util.Ui
+import macroid.Ui
 import macroid.FullDsl._
-import macroid.contrib.ExtraTweaks._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 

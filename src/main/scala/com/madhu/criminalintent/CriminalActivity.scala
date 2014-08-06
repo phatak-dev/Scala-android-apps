@@ -24,9 +24,9 @@ import java.util.UUID
 
 // import macroid stuff
 import macroid._
-import macroid.util.Ui
+import macroid.Ui
 import macroid.FullDsl._
-import macroid.contrib.ExtraTweaks._
+import macroid.contrib.LpTweaks._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -40,10 +40,9 @@ Contexts[FragmentActivity] with IdGeneration {
     var frameLayout = slot[FrameLayout]
    override def onCreate(savedInstanceState:Bundle) = {
      super.onCreate(savedInstanceState)
-     val view = l[FrameLayout] (      
-      f[CrimeFragment].framed(Id.map, Tag.map)
-     ) <~ wire(frameLayout) <~
-     layoutParams[FrameLayout](MATCH_PARENT,MATCH_PARENT)
+     val view = f[CrimeFragment].framed(Id.map, Tag.map) <~ 
+      wire(frameLayout) <~ matchParent
+     
      setContentView(getUi(view))
 
    }
