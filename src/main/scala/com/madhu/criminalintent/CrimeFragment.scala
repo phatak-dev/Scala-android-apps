@@ -70,8 +70,14 @@ trait CustomTweaks {
 
  object CrimeFragment {
   val EXTRA_CRIME_ID = "com.madhu.criminalintent.CrimeFragment.ID"
-   
+  def newInstance(uuid:UUID):CrimeFragment = {    
+    val argsBundle = new Bundle()    
+    argsBundle.putSerializable(EXTRA_CRIME_ID,uuid)
+    val fragment = new CrimeFragment()
+    fragment.setArguments(argsBundle)    
+    fragment    
  }
+}
 
 class CrimeFragment extends Fragment with CustomTweaks
   with Contexts[Fragment] {
@@ -79,11 +85,10 @@ class CrimeFragment extends Fragment with CustomTweaks
   var editText = slot[EditText]
   var checkBoxCrimeResolved = slot[CheckBox]
   override def onCreate(savedBundleInstance: Bundle) = {
-    super.onCreate(savedBundleInstance)
-    val crimeId = getActivity().getIntent().
-      getSerializableExtra(CrimeFragment.
-        EXTRA_CRIME_ID).asInstanceOf[
-      UUID]
+    super.onCreate(savedBundleInstance)    
+    val crimeId = getArguments().getSerializable(
+       CrimeFragment.EXTRA_CRIME_ID).asInstanceOf[
+      UUID]    
     crime = CrimeLab.getCrime(crimeId).get   
     /*crime = new Crime()
     crime.mDate = new Date()*/

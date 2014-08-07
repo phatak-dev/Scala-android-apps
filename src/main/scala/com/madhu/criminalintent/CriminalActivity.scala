@@ -40,11 +40,24 @@ class CriminalActivity extends FragmentActivity with Contexts[FragmentActivity] 
   var frameLayout = slot[FrameLayout]
   override def onCreate(savedInstanceState: Bundle) = {
     super.onCreate(savedInstanceState)
-    val view = f[CrimeFragment].framed(Id.map, Tag.map) <~
-      wire(frameLayout) <~ matchParent
-
+    val crimeID = getIntent().getSerializableExtra(CrimeFragment.
+        EXTRA_CRIME_ID).asInstanceOf[
+      UUID]
+     
+    val crimeFragment = CrimeFragment.newInstance(crimeID)
+    val view = l[FrameLayout]() <~ id(Id.fragmentContainer) <~ 
+     matchParent
     setContentView(getUi(view))
 
+    /*verbose code as l[Fragment] seems to be broken
+     sending bundle */
+    val fm = getSupportFragmentManager()
+    val fragment = fm.findFragmentById(Id.fragmentContainer)
+    if(fragment == null) {
+      fm.beginTransaction().add(Id.fragmentContainer, 
+        crimeFragment)
+        .commit()
+    }
   }
 
 }
