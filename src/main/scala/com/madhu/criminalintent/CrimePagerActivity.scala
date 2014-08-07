@@ -41,10 +41,10 @@ class CrimePagerActivity extends FragmentActivity with Contexts[FragmentActivity
     control its height manually*/
     val layoutParams = new FrameLayout.LayoutParams(
       MATCH_PARENT, MATCH_PARENT, 1)
-    layoutParams.height = toPx(200)
+    layoutParams.height = toPx(300)
     viewPager.setLayoutParams(layoutParams)
 
-    crimes = CrimeLab.getCrimes()
+    crimes = CrimeLab.getCrimes()    
 
     val fm = getSupportFragmentManager()
     viewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
@@ -56,6 +56,10 @@ class CrimePagerActivity extends FragmentActivity with Contexts[FragmentActivity
         CrimeFragment.newInstance(crime.uuid)
       }
     })
+
+    val index = crimes.zipWithIndex.filter(
+    	_._1.uuid == crimeID).map(_._2).head
+    viewPager.setCurrentItem(index)
 
   }
 
