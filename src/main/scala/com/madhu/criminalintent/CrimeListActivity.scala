@@ -1,6 +1,5 @@
 package com.madhu.criminalintent
 
-
 import android.support.v4.app._
 import android.os.Bundle
 import macroid._
@@ -12,13 +11,12 @@ import macroid.contrib._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class CrimeListActivity extends FragmentActivity with  
-Contexts[FragmentActivity] with IdGeneration {
-  override def onCreate(savedInstanceState:Bundle) = {
-     super.onCreate(savedInstanceState)
-     val view = f[CrimeListFragment].framed(Id.map, Tag.map) <~ 
-     matchParent     
-     setContentView(getUi(view))
+class CrimeListActivity extends FragmentActivity with Contexts[FragmentActivity] with IdGeneration {
+  override def onCreate(savedInstanceState: Bundle) = {
+    super.onCreate(savedInstanceState)
+    val view = f[CrimeListFragment].framed(Id.map, Tag.map) <~
+      matchParent
+    setContentView(getUi(view))
 
-   }
+  }
 }

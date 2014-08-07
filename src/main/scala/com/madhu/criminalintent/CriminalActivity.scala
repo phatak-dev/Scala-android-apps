@@ -1,10 +1,10 @@
 package com.madhu.criminalintent
 
 import android.os.Bundle
-import android.widget.{LinearLayout, TextView, Button,FrameLayout}
+import android.widget.{ LinearLayout, TextView, Button, FrameLayout }
 import android.view.ViewGroup.LayoutParams._
 import android.view.ViewGroup
-import android.view.{Gravity, View}
+import android.view.{ Gravity, View }
 import android.app.Activity
 import android.text.method.LinkMovementMethod;
 import android.content.Context;
@@ -31,26 +31,21 @@ import macroid.contrib.LpTweaks._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+case class Crime(var uuid: UUID = UUID.randomUUID(),
+  var mTitle: String = "",
+  var mDate: Date = new Date(), var solved: Boolean = false)
 
-case class Crime(var uuid:UUID = UUID.randomUUID(),
-  var mTitle:String="",
-  var mDate:Date = new Date(),var solved:Boolean=false) 
+class CriminalActivity extends FragmentActivity with Contexts[FragmentActivity] with IdGeneration {
 
-
-class CriminalActivity extends FragmentActivity with  
-Contexts[FragmentActivity] with IdGeneration {
-    
-    var frameLayout = slot[FrameLayout]
-   override def onCreate(savedInstanceState:Bundle) = {
-     super.onCreate(savedInstanceState)
-     val view = f[CrimeFragment].framed(Id.map, Tag.map) <~ 
+  var frameLayout = slot[FrameLayout]
+  override def onCreate(savedInstanceState: Bundle) = {
+    super.onCreate(savedInstanceState)
+    val view = f[CrimeFragment].framed(Id.map, Tag.map) <~
       wire(frameLayout) <~ matchParent
-     
-     setContentView(getUi(view))
 
-   }
+    setContentView(getUi(view))
 
+  }
 
- }
+}
 
- 

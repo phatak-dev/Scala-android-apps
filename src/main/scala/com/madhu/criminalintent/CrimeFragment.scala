@@ -1,13 +1,19 @@
 package com.madhu.criminalintent
 
 import android.os.Bundle
-import android.widget.{LinearLayout, TextView, Button,FrameLayout,
-EditText,CheckBox}
+import android.widget.{
+  LinearLayout,
+  TextView,
+  Button,
+  FrameLayout,
+  EditText,
+  CheckBox
+}
 import android.widget.CompoundButton
 import android.widget.CompoundButton._
 import android.view.ViewGroup.LayoutParams._
 import android.view.ViewGroup
-import android.view.{Gravity, View}
+import android.view.{ Gravity, View }
 import android.app.Activity
 import android.text.method.LinkMovementMethod;
 import android.content.Context;
@@ -39,111 +45,105 @@ import macroid.contrib._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
- trait CustomTweaks {       
-  def margin(width:Int,height:Int)(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0, all: Int = -1) = {
-  val layout = new LinearLayout.LayoutParams(width,height)
-  if (all >= 0) {
-    layout.setMargins(all, all, all, all)
-  } else {
-    layout.setMargins(left, top, right, bottom)
-  }
-  Tweak[View](_.setLayoutParams(layout))
- }
-
-  def listSeperator(implicit context:AppContext) : Tweak[TextView] = Tweak{    
-    (textView:TextView) => {      
-      textView.setAllCaps(true)
+trait CustomTweaks {
+  def margin(width: Int, height: Int)(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0, all: Int = -1) = {
+    val layout = new LinearLayout.LayoutParams(width, height)
+    if (all >= 0) {
+      layout.setMargins(all, all, all, all)
+    } else {
+      layout.setMargins(left, top, right, bottom)
     }
+    Tweak[View](_.setLayoutParams(layout))
+  }
+
+  def listSeperator(implicit context: AppContext): Tweak[TextView] = Tweak {
+    (textView: TextView) =>
+      {
+        textView.setAllCaps(true)
+      }
   } + lp[LinearLayout](
-    MATCH_PARENT,WRAP_CONTENT,Gravity.CENTER_VERTICAL) +    
-     TextTweaks.bold + TextTweaks.size(6 sp) + 
-     padding (left = 8 dp) 
+    MATCH_PARENT, WRAP_CONTENT, Gravity.CENTER_VERTICAL) +
+    TextTweaks.bold + TextTweaks.size(6 sp) +
+    padding(left = 8 dp)
 
 }
 
-
 class CrimeFragment extends Fragment with CustomTweaks
-with Contexts
-[Fragment] {
-  var  crime:Crime  = _
+  with Contexts[Fragment] {
+  var crime: Crime = _
   var editText = slot[EditText]
   var checkBoxCrimeResolved = slot[CheckBox]
-  override def onCreate(savedBundleInstance:Bundle) = {
-  	super.onCreate(savedBundleInstance)
-  	crime = new Crime()
+  override def onCreate(savedBundleInstance: Bundle) = {
+    super.onCreate(savedBundleInstance)
+    crime = new Crime()
     crime.mDate = new Date()
   }
-  override def onCreateView(inflator:LayoutInflater,
-  	parent:ViewGroup,savedBundleInstance:Bundle):View = {
-    val title = w[TextView] <~ text("Title") <~ 
+  override def onCreateView(inflator: LayoutInflater,
+    parent: ViewGroup, savedBundleInstance: Bundle): View = {
+    val title = w[TextView] <~ text("Title") <~
       matchWidth <~ listSeperator
-    val crimeInfo = w[EditText] <~ text("something") <~ 
+    val crimeInfo = w[EditText] <~ text("something") <~
       wire(editText) <~ matchWidth <~ margin(MATCH_PARENT,
-        WRAP_CONTENT)(left = 16 dp , right = 16 dp)
-    val details  = w[TextView] <~ text("Details") <~
-       matchWidth <~ listSeperator 
-    val dateButton = w[Button]  <~ text(crime.mDate.toString) <~ 
-    disable
+        WRAP_CONTENT)(left = 16 dp, right = 16 dp)
+    val details = w[TextView] <~ text("Details") <~
+      matchWidth <~ listSeperator
+    val dateButton = w[Button] <~ text(crime.mDate.toString) <~
+      disable
     val checkBox = w[CheckBox] <~ text("Crime solved") <~
-        wire(checkBoxCrimeResolved) 
+      wire(checkBoxCrimeResolved)
 
-    val portaitLayout = getUi{
-    l[LinearLayout](    
-       title, 
-       crimeInfo,
-       details,
-      dateButton <~ margin(MATCH_PARENT,
-        WRAP_CONTENT)(left = 16 dp , right = 16 dp)  ,
-      checkBox<~ margin(MATCH_PARENT,
-        WRAP_CONTENT)(left = 16 dp , right = 16 dp) 
-      ) <~ vertical <~ matchWidth
+    val portaitLayout = getUi {
+      l[LinearLayout](
+        title,
+        crimeInfo,
+        details,
+        dateButton <~ margin(MATCH_PARENT,
+          WRAP_CONTENT)(left = 16 dp, right = 16 dp),
+        checkBox <~ margin(MATCH_PARENT,
+          WRAP_CONTENT)(left = 16 dp, right = 16 dp)) <~ vertical <~ matchWidth
     }
 
     val landscapeLayout = getUi {
-      l[LinearLayout] (
+      l[LinearLayout](
         title,
         crimeInfo,
         details,
         l[LinearLayout](
-        dateButton <~ lp[LinearLayout](0 dp,
-        WRAP_CONTENT,1.0f),
-        checkBox <~ lp[LinearLayout](0 dp,
-        WRAP_CONTENT,1.0f)        
-      ) <~ horizontal <~ matchWidth
-      ) <~ vertical <~ matchWidth 
+          dateButton <~ lp[LinearLayout](0 dp,
+            WRAP_CONTENT, 1.0f),
+          checkBox <~ lp[LinearLayout](0 dp,
+            WRAP_CONTENT, 1.0f)) <~ horizontal <~ matchWidth) <~ vertical <~ matchWidth
     }
 
-    /* set event listener */    
-    getUi {                          
-     editText.get.addTextChangedListener(
-     	new TextWatcher() {
-     		override def onTextChanged(c:CharSequence,
-     		start:Int,before:Int,count:Int) = {
-     			crime.mTitle = c.toString()
-     			//d("tag","onTextChanged called")
-     		}
-     		override def beforeTextChanged(c:CharSequence,
-     		start:Int,count:Int,after:Int) = {
+    /* set event listener */
+    getUi {
+      editText.get.addTextChangedListener(
+        new TextWatcher() {
+          override def onTextChanged(c: CharSequence,
+            start: Int, before: Int, count: Int) = {
+            crime.mTitle = c.toString()
+            //d("tag","onTextChanged called")
+          }
+          override def beforeTextChanged(c: CharSequence,
+            start: Int, count: Int, after: Int) = {
 
-     		}
-     		override def afterTextChanged(e:Editable) ={
+          }
+          override def afterTextChanged(e: Editable) = {
 
-     		}
-     	}
-      )
+          }
+        })
 
       checkBoxCrimeResolved.get.setOnCheckedChangeListener(
-         new OnCheckedChangeListener() {
-          override def  onCheckedChanged(
-            buttonView:CompoundButton,isChecked:Boolean) {
-           crime.solved=isChecked
+        new OnCheckedChangeListener() {
+          override def onCheckedChanged(
+            buttonView: CompoundButton, isChecked: Boolean) {
+            crime.solved = isChecked
           }
-      })
+        })
 
-      Ui(true)	
+      Ui(true)
     }
-    if(portrait) portaitLayout else landscapeLayout       
+    if (portrait) portaitLayout else landscapeLayout
   }
-
 
 }
