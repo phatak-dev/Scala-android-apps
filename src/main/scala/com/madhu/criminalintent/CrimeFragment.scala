@@ -68,6 +68,11 @@ trait CustomTweaks {
 
 }
 
+ object CrimeFragment {
+  val EXTRA_CRIME_ID = "com.madhu.criminalintent.CrimeFragment.ID"
+   
+ }
+
 class CrimeFragment extends Fragment with CustomTweaks
   with Contexts[Fragment] {
   var crime: Crime = _
@@ -75,14 +80,19 @@ class CrimeFragment extends Fragment with CustomTweaks
   var checkBoxCrimeResolved = slot[CheckBox]
   override def onCreate(savedBundleInstance: Bundle) = {
     super.onCreate(savedBundleInstance)
-    crime = new Crime()
-    crime.mDate = new Date()
+    val crimeId = getActivity().getIntent().
+      getSerializableExtra(CrimeFragment.
+        EXTRA_CRIME_ID).asInstanceOf[
+      UUID]
+    crime = CrimeLab.getCrime(crimeId).get   
+    /*crime = new Crime()
+    crime.mDate = new Date()*/
   }
   override def onCreateView(inflator: LayoutInflater,
     parent: ViewGroup, savedBundleInstance: Bundle): View = {
     val title = w[TextView] <~ text("Title") <~
       matchWidth <~ listSeperator
-    val crimeInfo = w[EditText] <~ text("something") <~
+    val crimeInfo = w[EditText] <~ text(crime.mTitle) <~
       wire(editText) <~ matchWidth <~ margin(MATCH_PARENT,
         WRAP_CONTENT)(left = 16 dp, right = 16 dp)
     val details = w[TextView] <~ text("Details") <~
@@ -90,7 +100,9 @@ class CrimeFragment extends Fragment with CustomTweaks
     val dateButton = w[Button] <~ text(crime.mDate.toString) <~
       disable
     val checkBox = w[CheckBox] <~ text("Crime solved") <~
-      wire(checkBoxCrimeResolved)
+      wire(checkBoxCrimeResolved) <~ Tweak {
+        (view:CheckBox) => { view.setChecked(crime.solved)}
+      }
 
     val portaitLayout = getUi {
       l[LinearLayout](

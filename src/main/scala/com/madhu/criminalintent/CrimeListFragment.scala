@@ -103,9 +103,14 @@ class CrimeListFragment extends ListFragment
   override def onListItemClick(l: ListView, v: View, position: Int, id: Long) = {
     val crime = getListAdapter().getItem(position).
       asInstanceOf[Crime]
-    getUi {
+    /*getUi {
       toast("clicked" + crime.mTitle) <~ gravity(
         Gravity.TOP | Gravity.CENTER_HORIZONTAL) <~ fry
-    }
+    }*/
+    import android.content.Intent
+    val intent = new Intent(getActivity(),classOf[
+      CriminalActivity])
+    intent.putExtra(CrimeFragment.EXTRA_CRIME_ID,crime.uuid)
+    startActivity(intent)
   }
 }
