@@ -23,13 +23,44 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.JavaConverters._
 import android.util.Log.d
+import android.content.Context
+
 
 class CrimeListFragment extends ListFragment
   with Contexts[ListFragment] with IdGeneration {
-  var crimes: List[Crime] = _
+
+  class CustomAdapter(crimes: List[Crime],
+     layout : => View)
+      extends ArrayAdapter[Crime](getActivity(), 0, crimes.asJava) {
+      override def getView(position: Int,
+        convertView: View, parent: ViewGroup): View = {
+        val layoutView = if (convertView != null) convertView
+        else layout
+        val crime = getListAdapter().getItem(position).asInstanceOf[Crime]
+        val textView = layoutView.find[TextView](Id.crimeText)
+        val dateText = layoutView.find[TextView](Id.dateText)
+        val checkBox = layoutView.find[CheckBox](Id.checkBox)
+
+        getUi { textView <~ text(crime.mTitle) }
+        getUi { dateText <~ text(crime.mDate.toString) }
+        getUi {
+          checkBox <~ Tweak { (view: CheckBox) =>
+            {
+              view.setChecked(crime.solved)
+            }
+          }
+        }
+        layoutView
+      }
+    }
+
+
+  var crimes:List[Crime] = _
   override def onCreate(savedBundleInstance: Bundle) = {
     super.onCreate(savedBundleInstance)
     getActivity().setTitle("List of crimes")
+
+    d("$$$$$$","##on create crimelab")
     crimes = CrimeLab.getCrimes
     var checkBox = slot[CheckBox]
     def layout = getUi {
@@ -43,8 +74,8 @@ class CrimeListFragment extends ListFragment
                   MATCH_PARENT)
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
                 view.setLayoutParams(layoutParams)
-              }
-          } <~ Tweak { (view: CheckBox) => view.setFocusable(false) },
+              } 
+          } <~ disable <~ Tweak { (view: CheckBox) => view.setFocusable(false) },
         w[TextView] <~ Tweak {
           (view: View) =>
             {
@@ -70,47 +101,27 @@ class CrimeListFragment extends ListFragment
             }
         } <~ padding(left = 4 dp, right = 4 dp, top = 4 dp)
           <~ id(Id.dateText)) <~ lp[android.widget.AbsListView](
-          MATCH_PARENT, WRAP_CONTENT)
+          MATCH_PARENT, WRAP_CONTENT)          
     }
-
-    class CustomAdapter(crimes: List[Crime])
-      extends ArrayAdapter[Crime](getActivity(), 0, crimes.asJava) {
-      override def getView(position: Int,
-        convertView: View, parent: ViewGroup): View = {
-        val layoutView = if (convertView != null) convertView
-        else layout
-        val crime = getListAdapter().getItem(position).asInstanceOf[Crime]
-        val textView = layoutView.find[TextView](Id.crimeText)
-        val dateText = layoutView.find[TextView](Id.dateText)
-        val checkBox = layoutView.find[CheckBox](Id.checkBox)
-
-        getUi { textView <~ text(crime.mTitle) }
-        getUi { dateText <~ text(crime.mDate.toString) }
-        getUi {
-          checkBox <~ Tweak { (view: CheckBox) =>
-            {
-              view.setChecked(crime.solved)
-            }
-          }
-        }
-        layoutView
-      }
-    }
-    val customAdapter = new CustomAdapter(crimes)
+    val customAdapter = new CustomAdapter(crimes,layout)
     setListAdapter(customAdapter)
   }
 
+    
+
   override def onListItemClick(l: ListView, v: View, position: Int, id: Long) = {
     val crime = getListAdapter().getItem(position).
-      asInstanceOf[Crime]
-    /*getUi {
-      toast("clicked" + crime.mTitle) <~ gravity(
-        Gravity.TOP | Gravity.CENTER_HORIZONTAL) <~ fry
-    }*/
+      asInstanceOf[Crime]    
     import android.content.Intent
     val intent = new Intent(getActivity(),classOf[
       CriminalActivity])
     intent.putExtra(CrimeFragment.EXTRA_CRIME_ID,crime.uuid)
     startActivity(intent)
+  }
+
+  override def onResume() = {
+    super.onResume()
+    d("#########","on resume called")
+    (getListAdapter().asInstanceOf[CustomAdapter]).notifyDataSetChanged();
   }
 }

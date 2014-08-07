@@ -99,7 +99,24 @@ class CrimeFragment extends Fragment with CustomTweaks
       matchWidth <~ listSeperator
     val crimeInfo = w[EditText] <~ text(crime.mTitle) <~
       wire(editText) <~ matchWidth <~ margin(MATCH_PARENT,
-        WRAP_CONTENT)(left = 16 dp, right = 16 dp)
+        WRAP_CONTENT)(left = 16 dp, right = 16 dp) <~
+       Tweak{ (view:EditText) => {
+         view.addTextChangedListener(
+        new TextWatcher() {
+          override def onTextChanged(c: CharSequence,
+            start: Int, before: Int, count: Int) = {
+            crime.mTitle = c.toString()            
+          }
+          override def beforeTextChanged(c: CharSequence,
+            start: Int, count: Int, after: Int) = {
+            
+          }
+          override def afterTextChanged(e: Editable) = {
+            
+          }
+        })
+        }}
+
     val details = w[TextView] <~ text("Details") <~
       matchWidth <~ listSeperator
     val dateButton = w[Button] <~ text(crime.mDate.toString) <~
@@ -107,7 +124,15 @@ class CrimeFragment extends Fragment with CustomTweaks
     val checkBox = w[CheckBox] <~ text("Crime solved") <~
       wire(checkBoxCrimeResolved) <~ Tweak {
         (view:CheckBox) => { view.setChecked(crime.solved)}
-      }
+      } <~ Tweak{ (view:CheckBox) => {
+        view.setOnCheckedChangeListener(
+        new OnCheckedChangeListener() {
+          override def onCheckedChanged(
+            buttonView: CompoundButton, isChecked: Boolean) {
+            crime.solved = isChecked            
+          }
+        })
+      }}
 
     val portaitLayout = getUi {
       l[LinearLayout](
@@ -132,34 +157,6 @@ class CrimeFragment extends Fragment with CustomTweaks
             WRAP_CONTENT, 1.0f)) <~ horizontal <~ matchWidth) <~ vertical <~ matchWidth
     }
 
-    /* set event listener */
-    getUi {
-      editText.get.addTextChangedListener(
-        new TextWatcher() {
-          override def onTextChanged(c: CharSequence,
-            start: Int, before: Int, count: Int) = {
-            crime.mTitle = c.toString()
-            //d("tag","onTextChanged called")
-          }
-          override def beforeTextChanged(c: CharSequence,
-            start: Int, count: Int, after: Int) = {
-
-          }
-          override def afterTextChanged(e: Editable) = {
-
-          }
-        })
-
-      checkBoxCrimeResolved.get.setOnCheckedChangeListener(
-        new OnCheckedChangeListener() {
-          override def onCheckedChanged(
-            buttonView: CompoundButton, isChecked: Boolean) {
-            crime.solved = isChecked
-          }
-        })
-
-      Ui(true)
-    }
     if (portrait) portaitLayout else landscapeLayout
   }
 
