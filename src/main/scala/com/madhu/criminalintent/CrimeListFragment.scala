@@ -114,7 +114,7 @@ class CrimeListFragment extends ListFragment
       asInstanceOf[Crime]    
     import android.content.Intent
     val intent = new Intent(getActivity(),classOf[
-      CriminalActivity])
+      CrimePagerActivity])
     intent.putExtra(CrimeFragment.EXTRA_CRIME_ID,crime.uuid)
     startActivity(intent)
   }

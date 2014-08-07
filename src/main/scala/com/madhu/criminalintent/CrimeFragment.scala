@@ -68,15 +68,15 @@ trait CustomTweaks {
 
 }
 
- object CrimeFragment {
+object CrimeFragment {
   val EXTRA_CRIME_ID = "com.madhu.criminalintent.CrimeFragment.ID"
-  def newInstance(uuid:UUID):CrimeFragment = {    
-    val argsBundle = new Bundle()    
-    argsBundle.putSerializable(EXTRA_CRIME_ID,uuid)
+  def newInstance(uuid: UUID): CrimeFragment = {
+    val argsBundle = new Bundle()
+    argsBundle.putSerializable(EXTRA_CRIME_ID, uuid)
     val fragment = new CrimeFragment()
-    fragment.setArguments(argsBundle)    
-    fragment    
- }
+    fragment.setArguments(argsBundle)
+    fragment
+  }
 }
 
 class CrimeFragment extends Fragment with CustomTweaks
@@ -85,11 +85,10 @@ class CrimeFragment extends Fragment with CustomTweaks
   var editText = slot[EditText]
   var checkBoxCrimeResolved = slot[CheckBox]
   override def onCreate(savedBundleInstance: Bundle) = {
-    super.onCreate(savedBundleInstance)    
+    super.onCreate(savedBundleInstance)
     val crimeId = getArguments().getSerializable(
-       CrimeFragment.EXTRA_CRIME_ID).asInstanceOf[
-      UUID]    
-    crime = CrimeLab.getCrime(crimeId).get   
+      CrimeFragment.EXTRA_CRIME_ID).asInstanceOf[UUID]
+    crime = CrimeLab.getCrime(crimeId).get
     /*crime = new Crime()
     crime.mDate = new Date()*/
   }
@@ -100,22 +99,24 @@ class CrimeFragment extends Fragment with CustomTweaks
     val crimeInfo = w[EditText] <~ text(crime.mTitle) <~
       wire(editText) <~ matchWidth <~ margin(MATCH_PARENT,
         WRAP_CONTENT)(left = 16 dp, right = 16 dp) <~
-       Tweak{ (view:EditText) => {
-         view.addTextChangedListener(
-        new TextWatcher() {
-          override def onTextChanged(c: CharSequence,
-            start: Int, before: Int, count: Int) = {
-            crime.mTitle = c.toString()            
+        Tweak { (view: EditText) =>
+          {
+            view.addTextChangedListener(
+              new TextWatcher() {
+                override def onTextChanged(c: CharSequence,
+                  start: Int, before: Int, count: Int) = {
+                  crime.mTitle = c.toString()
+                }
+                override def beforeTextChanged(c: CharSequence,
+                  start: Int, count: Int, after: Int) = {
+
+                }
+                override def afterTextChanged(e: Editable) = {
+
+                }
+              })
           }
-          override def beforeTextChanged(c: CharSequence,
-            start: Int, count: Int, after: Int) = {
-            
-          }
-          override def afterTextChanged(e: Editable) = {
-            
-          }
-        })
-        }}
+        }
 
     val details = w[TextView] <~ text("Details") <~
       matchWidth <~ listSeperator
@@ -123,16 +124,18 @@ class CrimeFragment extends Fragment with CustomTweaks
       disable
     val checkBox = w[CheckBox] <~ text("Crime solved") <~
       wire(checkBoxCrimeResolved) <~ Tweak {
-        (view:CheckBox) => { view.setChecked(crime.solved)}
-      } <~ Tweak{ (view:CheckBox) => {
-        view.setOnCheckedChangeListener(
-        new OnCheckedChangeListener() {
-          override def onCheckedChanged(
-            buttonView: CompoundButton, isChecked: Boolean) {
-            crime.solved = isChecked            
-          }
-        })
-      }}
+        (view: CheckBox) => { view.setChecked(crime.solved) }
+      } <~ Tweak { (view: CheckBox) =>
+        {
+          view.setOnCheckedChangeListener(
+            new OnCheckedChangeListener() {
+              override def onCheckedChanged(
+                buttonView: CompoundButton, isChecked: Boolean) {
+                crime.solved = isChecked
+              }
+            })
+        }
+      }
 
     val portaitLayout = getUi {
       l[LinearLayout](
