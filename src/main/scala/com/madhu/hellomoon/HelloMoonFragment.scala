@@ -70,6 +70,11 @@ class HelloMoonFragment extends Fragment
             audioPlayer.play(getActivity())
             Ui(true)
           },
+        w[Button] <~ text("pause") <~ On.click{
+          audioPlayer.pause()
+          Ui(true)
+        } <~ lp[TableRow](
+          WRAP_CONTENT,WRAP_CONTENT),
         w[Button] <~ text("stop") <~ On.click{
           audioPlayer.stop()
           Ui(true)
