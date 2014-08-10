@@ -12,7 +12,7 @@
         android:icon="@drawable/android:star_big_on"
         >
 
-        <activity android:name=".HelloMoonActivity">
+        <activity android:name=".VideoViewActivity">
         <intent-filter>
          <action android:name="android.intent.action.MAIN" />
            <category android:name="android.intent.category.LAUNCHER" />
