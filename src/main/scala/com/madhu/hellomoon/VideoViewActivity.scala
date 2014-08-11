@@ -1,8 +1,7 @@
 package com.madhu.hellomoon
 
 
-import android.support.v4.app._
-import android.widget.{MediaController, VideoView, LinearLayout}
+import android.widget.{MediaController, VideoView}
 import android.net.Uri
 import android.os.Bundle
 
