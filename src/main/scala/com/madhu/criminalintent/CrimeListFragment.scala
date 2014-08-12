@@ -148,8 +148,8 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
 
   override def onCreateOptionsMenu(menu: Menu, inflater: MenuInflater): Unit = {
     super.onCreateOptionsMenu(menu, inflater)
-    val menuItem = menu.add("New crime")
-    menuItem.onClick( (item:MenuItem) => {
+    val addCrimeMenuItem = menu.add("New crime")
+    addCrimeMenuItem.onClick( (item:MenuItem) => {
       d(tag," on click called")
       /*getUi{toast("menu item clicked") <~ gravity(Gravity.TOP | Gravity.CENTER_VERTICAL) <~ fry
        }; true*/
@@ -160,8 +160,23 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
       startActivityForResult(intent,0)
       true
     })
-    menuItem.setIcon(android.R.drawable.ic_menu_add).
+
+
+    addCrimeMenuItem.setIcon(android.R.drawable.ic_menu_add).
       setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT |
       MenuItem.SHOW_AS_ACTION_IF_ROOM)
+    menu.add("Show subtitle").setIcon(android.R.drawable.btn_minus).onClick((item:MenuItem) =>{
+       if(getActivity.getActionBar.getSubtitle==null) {
+         getActivity.getActionBar.setSubtitle("Subtitle")
+         item.setTitle("Hide subtitle")
+       }
+      else {
+         getActivity.getActionBar.setSubtitle(null)
+         item.setTitle("Show subtitle")
+       }
+      true
+      })
+     .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+
   }
 }
