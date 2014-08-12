@@ -2,28 +2,24 @@ package com.madhu.criminalintent
 
 import android.support.v4.app._
 import android.os.Bundle
-import android.widget.{
-TextView,
-ListView,
-RelativeLayout,
-CheckBox
-}
-import android.widget.ArrayAdapter
+import android.widget._
 import android.view.ViewGroup.LayoutParams._
 import android.view._
 
 import macroid._
+import macroid.contrib.LpTweaks._
 import macroid.FullDsl._
 import macroid.contrib._
 import scala.collection.JavaConverters._
 import android.util.Log.d
 import android.view.MenuItem.OnMenuItemClickListener
 import android.content.Intent
+import macroid.AppContext
 
 
 trait MenuHelpers {
 
-  implicit class MenuOps(item:MenuItem)(implicit appContext:
+  implicit class MenuOps(item: MenuItem)(implicit appContext:
   AppContext) {
     def onClick(fn: => (MenuItem => Boolean)) = item.setOnMenuItemClickListener(
       new OnMenuItemClickListener {
@@ -32,7 +28,8 @@ trait MenuHelpers {
         }
       }
     )
-    implicit def toMenuItem(item:MenuItem) = new MenuOps(item)
+
+    implicit def toMenuItem(item: MenuItem) = new MenuOps(item)
   }
 
 
@@ -131,6 +128,38 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
   }
 
 
+  override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
+    super.onCreateView(inflater, container, savedInstanceState)
+    val emptyView = l[LinearLayout](
+      w[TextView] <~ text("No crimes in the list"),
+      w[Button] <~ text("Add crime") <~ On.click {
+        val crime = new Crime()
+        CrimeLab.addCrime(crime)
+        val intent = new Intent(getActivity, classOf[CrimePagerActivity])
+        intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
+        startActivityForResult(intent, 0)
+        Ui(true)
+      } <~ lp[LinearLayout](WRAP_CONTENT,WRAP_CONTENT,Gravity.CENTER_HORIZONTAL)
+    ) <~ Tweak {
+      (view: View) => view.setId(android.R.id.empty)
+    } <~ vertical <~ lp[FrameLayout](WRAP_CONTENT,WRAP_CONTENT,Gravity.CENTER_HORIZONTAL |
+      Gravity.CENTER_VERTICAL)
+
+
+    val listView = w[ListView] <~ matchParent <~ Tweak {
+      (view: ListView) => {
+        view.setId(android.R.id.list)
+      }
+    }
+
+    val layout = l[FrameLayout](
+      listView,
+      emptyView
+    )
+
+    getUi(layout)
+  }
+
   override def onListItemClick(l: ListView, v: View, position: Int, id: Long) = {
     val crime = getListAdapter().getItem(position).
       asInstanceOf[Crime]
@@ -149,15 +178,15 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
   override def onCreateOptionsMenu(menu: Menu, inflater: MenuInflater): Unit = {
     super.onCreateOptionsMenu(menu, inflater)
     val addCrimeMenuItem = menu.add("New crime")
-    addCrimeMenuItem.onClick( (item:MenuItem) => {
-      d(tag," on click called")
+    addCrimeMenuItem.onClick((item: MenuItem) => {
+      d(tag, " on click called")
       /*getUi{toast("menu item clicked") <~ gravity(Gravity.TOP | Gravity.CENTER_VERTICAL) <~ fry
        }; true*/
       val crime = new Crime()
       CrimeLab.addCrime(crime)
-      val intent = new Intent(getActivity,classOf[CrimePagerActivity])
-      intent.putExtra(CrimeFragment.EXTRA_CRIME_ID,crime.uuid)
-      startActivityForResult(intent,0)
+      val intent = new Intent(getActivity, classOf[CrimePagerActivity])
+      intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
+      startActivityForResult(intent, 0)
       true
     })
 
@@ -165,18 +194,18 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
     addCrimeMenuItem.setIcon(android.R.drawable.ic_menu_add).
       setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT |
       MenuItem.SHOW_AS_ACTION_IF_ROOM)
-    menu.add("Show subtitle").setIcon(android.R.drawable.btn_minus).onClick((item:MenuItem) =>{
-       if(getActivity.getActionBar.getSubtitle==null) {
-         getActivity.getActionBar.setSubtitle("Subtitle")
-         item.setTitle("Hide subtitle")
-       }
+    menu.add("Show subtitle").setIcon(android.R.drawable.btn_minus).onClick((item: MenuItem) => {
+      if (getActivity.getActionBar.getSubtitle == null) {
+        getActivity.getActionBar.setSubtitle("Subtitle")
+        item.setTitle("Hide subtitle")
+      }
       else {
-         getActivity.getActionBar.setSubtitle(null)
-         item.setTitle("Show subtitle")
-       }
+        getActivity.getActionBar.setSubtitle(null)
+        item.setTitle("Show subtitle")
+      }
       true
-      })
-     .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+    })
+      .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
 
   }
 }
