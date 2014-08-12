@@ -18,6 +18,7 @@ import macroid.contrib._
 import scala.collection.JavaConverters._
 import android.util.Log.d
 import android.view.MenuItem.OnMenuItemClickListener
+import android.content.Intent
 
 
 trait MenuHelpers {
@@ -70,6 +71,7 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
       }
       layoutView
     }
+
   }
 
 
@@ -124,6 +126,7 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
     val customAdapter = new CustomAdapter(crimes, layout)
     setListAdapter(customAdapter)
     setHasOptionsMenu(true)
+
     d(tag, "oncreate")
   }
 
@@ -148,8 +151,14 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
     val menuItem = menu.add("New crime")
     menuItem.onClick( (item:MenuItem) => {
       d(tag," on click called")
-      getUi{toast("menu item clicked") <~ gravity(Gravity.TOP | Gravity.CENTER_VERTICAL) <~ fry
-       }; true
+      /*getUi{toast("menu item clicked") <~ gravity(Gravity.TOP | Gravity.CENTER_VERTICAL) <~ fry
+       }; true*/
+      val crime = new Crime()
+      CrimeLab.addCrime(crime)
+      val intent = new Intent(getActivity,classOf[CrimePagerActivity])
+      intent.putExtra(CrimeFragment.EXTRA_CRIME_ID,crime.uuid)
+      startActivityForResult(intent,0)
+      true
     })
     menuItem.setIcon(android.R.drawable.ic_menu_add).
       setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT |

@@ -5,45 +5,25 @@ import android.widget.{
   LinearLayout,
   TextView,
   Button,
-  FrameLayout,
   EditText,
   CheckBox
 }
 import android.widget.CompoundButton
 import android.widget.CompoundButton._
 import android.view.ViewGroup.LayoutParams._
-import android.view.ViewGroup
-import android.view.{ Gravity, View }
-import android.app.Activity
-import android.text.method.LinkMovementMethod;
-import android.content.Context;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
-import android.text.style.URLSpan;
-import android.text.Spanned;
-import android.graphics.Typeface;
-import android.hardware.Camera;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.util.Log.d
-import android.content.Intent
+import android.view._
+
 import android.support.v4.app._
 import java.util.UUID
-import android.view.LayoutInflater
 import android.text.TextWatcher
 import android.text.Editable
-import java.util.Date
+import android.content.Intent
 
 // import macroid stuff
 import macroid._
-import macroid.Ui
 import macroid.FullDsl._
 import macroid.contrib.LpTweaks._
-import macroid.contrib.TextTweaks
 import macroid.contrib._
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait CustomTweaks {
   def margin(width: Int, height: Int)(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0, all: Int = -1) = {
@@ -160,7 +140,20 @@ class CrimeFragment extends Fragment with CustomTweaks
             WRAP_CONTENT, 1.0f)) <~ horizontal <~ matchWidth) <~ vertical <~ matchWidth
     }
 
+    getActivity().getActionBar().setDisplayHomeAsUpEnabled(true)
+    setHasOptionsMenu(true)
     if (portrait) portaitLayout else landscapeLayout
   }
 
+  override def onOptionsItemSelected(item: MenuItem): Boolean = {
+    item.getItemId match {
+      case android.R.id.home => {
+       val intent = new Intent(getActivity,classOf[CrimeListActivity])
+       intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+        true
+      }
+      case _ => super.onOptionsItemSelected(item)
+    }
+  }
 }
