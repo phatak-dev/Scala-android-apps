@@ -21,11 +21,14 @@
         </activity>
         <activity
           android:label="CriminalIntent"
-          android:name=".CriminalActivity">                
+          android:name=".CriminalActivity"
+          >
         </activity>        
         <activity
           android:label="CriminalIntentPage"
           android:name=".CrimePagerActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value=".CrimeListActivity" />
         </activity>
     </application>
 </manifest>
