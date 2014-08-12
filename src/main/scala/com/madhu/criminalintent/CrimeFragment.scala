@@ -17,7 +17,6 @@ import android.support.v4.app._
 import java.util.UUID
 import android.text.TextWatcher
 import android.text.Editable
-import android.content.Intent
 
 // import macroid stuff
 
@@ -173,6 +172,6 @@ with Contexts[Fragment] {
 
   override def onPause(): Unit = {
     super.onPause()
-    CrimeLab(getActivity).saveCrimes(getActivity)
+    CrimeLab(getActivity).saveCrimes()
   }
 }
