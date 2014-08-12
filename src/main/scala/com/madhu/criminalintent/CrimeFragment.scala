@@ -70,7 +70,7 @@ with Contexts[Fragment] {
     super.onCreate(savedBundleInstance)
     val crimeId = getArguments().getSerializable(
       CrimeFragment.EXTRA_CRIME_ID).asInstanceOf[UUID]
-    crime = CrimeLab.getCrime(crimeId).get
+    crime = CrimeLab(getActivity).getCrime(crimeId).get
     /*crime = new Crime()
     crime.mDate = new Date()*/
   }
@@ -169,5 +169,10 @@ with Contexts[Fragment] {
       }
       case _ => super.onOptionsItemSelected(item)
     }
+  }
+
+  override def onPause(): Unit = {
+    super.onPause()
+    CrimeLab(getActivity).saveCrimes(getActivity)
   }
 }

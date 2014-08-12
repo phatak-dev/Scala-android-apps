@@ -31,10 +31,6 @@ import macroid.contrib.LpTweaks._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class Crime(var uuid: UUID = UUID.randomUUID(),
-  var mTitle: String = "",
-  var mDate: Date = new Date(), var solved: Boolean = false)
-
 class CriminalActivity extends FragmentActivity with Contexts[FragmentActivity] with IdGeneration {
 
   var frameLayout = slot[FrameLayout]

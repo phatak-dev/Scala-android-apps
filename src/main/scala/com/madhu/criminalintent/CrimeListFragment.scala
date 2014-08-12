@@ -77,7 +77,7 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
   override def onCreate(savedBundleInstance: Bundle) = {
     super.onCreate(savedBundleInstance)
     getActivity().setTitle("List of crimes")
-    crimes = CrimeLab.getCrimes
+    crimes = CrimeLab(getActivity).getCrimes
     var checkBox = slot[CheckBox]
     def layout = getUi {
       l[RelativeLayout](
@@ -134,7 +134,7 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
       w[TextView] <~ text("No crimes in the list"),
       w[Button] <~ text("Add crime") <~ On.click {
         val crime = new Crime()
-        CrimeLab.addCrime(crime)
+        CrimeLab(getActivity).addCrime(crime)
         val intent = new Intent(getActivity, classOf[CrimePagerActivity])
         intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
         startActivityForResult(intent, 0)
@@ -183,7 +183,7 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
       /*getUi{toast("menu item clicked") <~ gravity(Gravity.TOP | Gravity.CENTER_VERTICAL) <~ fry
        }; true*/
       val crime = new Crime()
-      CrimeLab.addCrime(crime)
+      CrimeLab(getActivity).addCrime(crime)
       val intent = new Intent(getActivity, classOf[CrimePagerActivity])
       intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
       startActivityForResult(intent, 0)

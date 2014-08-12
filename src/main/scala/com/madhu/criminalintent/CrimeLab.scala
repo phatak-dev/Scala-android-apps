@@ -4,19 +4,25 @@ import java.util.UUID
 
 import android.util.Log.d
 
-import macroid.FullDsl._
-import macroid._
-import macroid.contrib.LpTweaks._
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import android.content.Context
+
+  class CrimeLab(context:Context) {
+  var crimes:List[Crime] = List()
+  val fileName = "crimes.json"
+    def getCrimes(): List[Crime] = crimes
+    def addCrime(crime:Crime) = crimes = crime :: crimes
+    def getCrime(id: UUID): Option[Crime] = crimes.find(value => value.uuid == id)
+    def saveCrimes(implicit context:Context) = {
+      new CrimeSerializer(fileName,context).saveCrimes(getCrimes)
+      d("#####","saved to file")
+    }
+}
+
+
 object CrimeLab {
- var crimes:List[Crime] = List() /*(1 until 100) map (i => { val crime = new Crime()
-    crime.mTitle = "Set mTitle" + i    
-    crime.solved = (i % 2) == 0 
-     crime }) toList */
- 
-   def getCrimes(): List[Crime] = crimes
-   def addCrime(crime:Crime) = crimes = crime :: crimes
-   def getCrime(id: UUID): Option[Crime] = crimes.find(value => value.uuid == id)	 
-  
+   var crimeLab:CrimeLab = null
+  def apply(implicit con:Context) = {
+    if(crimeLab==null) crimeLab = new CrimeLab(con)
+    crimeLab
+  }
 }

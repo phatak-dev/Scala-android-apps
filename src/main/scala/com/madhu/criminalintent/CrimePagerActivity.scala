@@ -44,7 +44,7 @@ class CrimePagerActivity extends FragmentActivity with Contexts[FragmentActivity
     layoutParams.height = toPx(300)
     viewPager.setLayoutParams(layoutParams)
 
-    crimes = CrimeLab.getCrimes()    
+    crimes = CrimeLab(this).getCrimes()
 
     val fm = getSupportFragmentManager()
     viewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
