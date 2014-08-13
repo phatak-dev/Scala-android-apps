@@ -4,6 +4,7 @@ import play.api.libs.json.Json
 import java.io._
 import android.content.Context
 import scala.io.Source
+import android.util.Log.d
 
 /**
  * Created by madhu on 12/8/14.
@@ -28,6 +29,9 @@ class CrimeSerializer(fileName: String, context: Context) {
     try {
       in = context.openFileInput(fileName)
       op(in)
+    }
+    catch {
+      case e:Exception => { d("$$$$$$$$","file issue",e)}
     }
     finally {
       if (in != null) in.close()

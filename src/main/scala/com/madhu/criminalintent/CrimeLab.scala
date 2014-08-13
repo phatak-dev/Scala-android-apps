@@ -22,6 +22,10 @@ class CrimeLab(context: Context) {
     d("#####", "saved to file")
   }
 
+  def deleteCrime(crime:Crime) = {
+    crimes = crimes.filter(_.uuid != crime.uuid)
+  }
+
   def loadCrimes() {
     d("############", "loadCrimes")
     crimes = serializer.readCrimes()

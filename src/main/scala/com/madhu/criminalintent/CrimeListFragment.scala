@@ -4,7 +4,7 @@ import android.support.v4.app._
 import android.os.Bundle
 import android.widget._
 import android.view.ViewGroup.LayoutParams._
-import android.view._
+
 
 import macroid._
 import macroid.contrib.LpTweaks._
@@ -14,7 +14,11 @@ import scala.collection.JavaConverters._
 import android.util.Log.d
 import android.view.MenuItem.OnMenuItemClickListener
 import android.content.Intent
+import android.widget.AbsListView.MultiChoiceModeListener
+import android.view._
 import macroid.AppContext
+import android.view.ContextMenu.ContextMenuInfo
+import android.widget.AdapterView.AdapterContextMenuInfo
 
 
 trait MenuHelpers {
@@ -40,10 +44,11 @@ class CrimeListFragment extends ListFragment
 with Contexts[ListFragment] with IdGeneration with MenuHelpers {
 
   val tag = "com.madhu.criminalintent.CrimeListFragment.Tag"
+  var crimes: List[Crime] = _
 
-  class CustomAdapter(crimes: List[Crime],
-                      layout: => View)
-    extends ArrayAdapter[Crime](getActivity(), 0, crimes.asJava) {
+  class CustomAdapter(layout: => View,var crimes:List[Crime])
+    extends BaseAdapter{
+    override def getCount: Int = crimes.size
     override def getView(position: Int,
                          convertView: View, parent: ViewGroup): View = {
       val layoutView = if (convertView != null) convertView
@@ -68,11 +73,12 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
       }
       layoutView
     }
-
+   override def getItem(pos:Int) = crimes(pos)
+   override def getItemId(pos:Int) = pos
   }
 
 
-  var crimes: List[Crime] = _
+
 
   override def onCreate(savedBundleInstance: Bundle) = {
     super.onCreate(savedBundleInstance)
@@ -132,16 +138,25 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
     }
 
 
-    val customAdapter = new CustomAdapter(crimes, layout)
+    val customAdapter = new CustomAdapter(layout,crimes)
     setListAdapter(customAdapter)
     setHasOptionsMenu(true)
+
+
+
 
     d(tag, "oncreate")
   }
 
 
+  override def onActivityCreated(savedInstanceState: Bundle): Unit = {
+    d(tag,"activity created")
+    registerForContextMenu(this.getListView)
+    super.onActivityCreated(savedInstanceState)
+  }
+
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    super.onCreateView(inflater, container, savedInstanceState)
+   val v =  super.onCreateView(inflater, container, savedInstanceState)
     val emptyView = l[LinearLayout](
       w[TextView] <~
         text("No crimes in the list"),
@@ -180,6 +195,33 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
       emptyView
     )
 
+
+   v.findViewById(android.R.id.list).asInstanceOf[ListView].setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL)
+    v.findViewById(android.R.id.list).asInstanceOf[ListView].setMultiChoiceModeListener(new MultiChoiceModeListener {
+
+     override def  onItemCheckedStateChanged(actionMode:ActionMode,position:Int,id:Long,checked:Boolean):Unit = {}
+
+     override def  onCreateActionMode(actionMode:ActionMode,menu:Menu)= {
+        d(tag,"oncreate action called")
+        menu.add("Delete").setIcon(android.R.drawable.ic_menu_delete)
+        true
+     }
+
+     override def  onActionItemClicked(mode:ActionMode,menuItem:MenuItem) = {
+
+        true
+     }
+
+     override def  onDestroyActionMode(mode:ActionMode) = {
+
+     }
+
+     override def onPrepareActionMode(action:ActionMode,menu:Menu)= {
+       false
+     }
+
+   })
+
     getUi(layout)
   }
 
@@ -193,9 +235,14 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
     startActivity(intent)
   }
 
+
+
   override def onResume() = {
     super.onResume()
-    (getListAdapter().asInstanceOf[CustomAdapter]).notifyDataSetChanged();
+    crimes = CrimeLab(getActivity).getCrimes()
+    val adapter = getListAdapter.asInstanceOf[CustomAdapter]
+    adapter.crimes = crimes
+    adapter.notifyDataSetChanged()
   }
 
   override def onCreateOptionsMenu(menu: Menu, inflater: MenuInflater): Unit = {
@@ -228,5 +275,20 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
     })
       .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
 
+  }
+
+  override def onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo): Unit = {
+    menu.add("Delete").onClick(item => {
+      val info = item.getMenuInfo.asInstanceOf[AdapterContextMenuInfo]
+      val position = info.position
+      val crime = crimes(position)
+      CrimeLab(getActivity).deleteCrime(crime)
+      crimes = CrimeLab(getActivity).getCrimes()
+      val adapter = getListAdapter.asInstanceOf[CustomAdapter]
+      adapter.crimes = crimes
+      adapter.notifyDataSetChanged()
+      true
+    })
+    super.onCreateContextMenu(menu, v, menuInfo)
   }
 }
