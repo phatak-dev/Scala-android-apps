@@ -151,7 +151,51 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
 
   override def onActivityCreated(savedInstanceState: Bundle): Unit = {
     d(tag,"activity created")
-    registerForContextMenu(this.getListView)
+    //registerForContextMenu(this.getListView)
+
+    this.getListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL)
+    this.getListView.findViewById(android.R.id.list).asInstanceOf[ListView].setMultiChoiceModeListener(new MultiChoiceModeListener {
+
+      override def  onItemCheckedStateChanged(actionMode:ActionMode,position:Int,id:Long,checked:Boolean):Unit = {}
+
+      override def  onCreateActionMode(actionMode:ActionMode,menu:Menu)= {
+        menu.add("Delete").setIcon(android.R.drawable.ic_menu_delete).onClick(
+          (item:MenuItem) => {
+            val adapter = getListAdapter.asInstanceOf[CustomAdapter]
+            val positions = crimes.zipWithIndex.map(_._2).flatMap(
+             pos => if(getListView.isItemChecked(pos)) List(pos) else List()
+            )
+            positions.foreach(position => CrimeLab(getActivity).deleteCrime(
+                crimes(position)
+            ))
+            actionMode.finish()
+            crimes = CrimeLab(getActivity).getCrimes()
+            adapter.crimes = crimes
+            adapter.notifyDataSetChanged()
+            true
+          }
+        )
+       true
+      }
+
+      override def  onActionItemClicked(mode:ActionMode,menuItem:MenuItem) = {
+
+        true
+      }
+
+      override def  onDestroyActionMode(mode:ActionMode) = {
+
+      }
+
+      override def onPrepareActionMode(action:ActionMode,menu:Menu)= {
+        false
+      }
+
+    })
+
+
+
+
     super.onActivityCreated(savedInstanceState)
   }
 
@@ -194,33 +238,6 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
       listView,
       emptyView
     )
-
-
-   v.findViewById(android.R.id.list).asInstanceOf[ListView].setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL)
-    v.findViewById(android.R.id.list).asInstanceOf[ListView].setMultiChoiceModeListener(new MultiChoiceModeListener {
-
-     override def  onItemCheckedStateChanged(actionMode:ActionMode,position:Int,id:Long,checked:Boolean):Unit = {}
-
-     override def  onCreateActionMode(actionMode:ActionMode,menu:Menu)= {
-        d(tag,"oncreate action called")
-        menu.add("Delete").setIcon(android.R.drawable.ic_menu_delete)
-        true
-     }
-
-     override def  onActionItemClicked(mode:ActionMode,menuItem:MenuItem) = {
-
-        true
-     }
-
-     override def  onDestroyActionMode(mode:ActionMode) = {
-
-     }
-
-     override def onPrepareActionMode(action:ActionMode,menu:Menu)= {
-       false
-     }
-
-   })
 
     getUi(layout)
   }
