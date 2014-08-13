@@ -1,10 +1,10 @@
 package com.madhu.criminalintent
 
 import android.os.Bundle
-import android.widget.{ LinearLayout, TextView, Button, FrameLayout }
+import android.widget.{LinearLayout, TextView, Button, FrameLayout}
 import android.view.ViewGroup.LayoutParams._
 import android.view.ViewGroup
-import android.view.{ Gravity, View }
+import android.view.{Gravity, View}
 import android.app.Activity
 import android.text.method.LinkMovementMethod;
 import android.content.Context;
@@ -24,6 +24,7 @@ import java.util.UUID
 import java.util.Date
 
 // import macroid stuff
+
 import macroid._
 import macroid.Ui
 import macroid.FullDsl._
@@ -34,23 +35,25 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class CriminalActivity extends FragmentActivity with Contexts[FragmentActivity] with IdGeneration {
 
   var frameLayout = slot[FrameLayout]
+
   override def onCreate(savedInstanceState: Bundle) = {
     super.onCreate(savedInstanceState)
     val crimeID = getIntent().getSerializableExtra(CrimeFragment.
-        EXTRA_CRIME_ID).asInstanceOf[
+      EXTRA_CRIME_ID).asInstanceOf[
       UUID]
-     
+
     val crimeFragment = CrimeFragment.newInstance(crimeID)
-    val view = l[FrameLayout]() <~ id(Id.fragmentContainer) <~ 
-     matchParent
+    val view = l[FrameLayout]() <~
+      id(Id.fragmentContainer) <~
+      matchParent
     setContentView(getUi(view))
 
     /*verbose code as l[Fragment] seems to be broken
      sending bundle */
     val fm = getSupportFragmentManager()
     val fragment = fm.findFragmentById(Id.fragmentContainer)
-    if(fragment == null) {
-      fm.beginTransaction().add(Id.fragmentContainer, 
+    if (fragment == null) {
+      fm.beginTransaction().add(Id.fragmentContainer,
         crimeFragment)
         .commit()
     }

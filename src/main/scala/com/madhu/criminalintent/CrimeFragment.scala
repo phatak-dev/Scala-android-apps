@@ -70,17 +70,20 @@ with Contexts[Fragment] {
     val crimeId = getArguments().getSerializable(
       CrimeFragment.EXTRA_CRIME_ID).asInstanceOf[UUID]
     crime = CrimeLab(getActivity).getCrime(crimeId).get
-    /*crime = new Crime()
-    crime.mDate = new Date()*/
   }
 
   override def onCreateView(inflator: LayoutInflater,
                             parent: ViewGroup, savedBundleInstance: Bundle): View = {
-    val title = w[TextView] <~ text("Title") <~
-      matchWidth <~ listSeperator
-    val crimeInfo = w[EditText] <~ text(crime.mTitle) <~
-      wire(editText) <~ matchWidth <~ margin(MATCH_PARENT,
-      WRAP_CONTENT)(left = 16 dp, right = 16 dp) <~
+    val title = w[TextView] <~
+      text("Title") <~
+      matchWidth <~
+      listSeperator
+
+    val crimeInfo = w[EditText] <~
+      text(crime.mTitle) <~
+      wire(editText) <~
+      matchWidth <~
+      margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp) <~
       Tweak {
         (view: EditText) => {
           view.addTextChangedListener(
@@ -102,36 +105,45 @@ with Contexts[Fragment] {
         }
       }
 
-    val details = w[TextView] <~ text("Details") <~
-      matchWidth <~ listSeperator
-    val dateButton = w[Button] <~ text(crime.mDate.toString) <~
-      disable
-    val checkBox = w[CheckBox] <~ text("Crime solved") <~
-      wire(checkBoxCrimeResolved) <~ Tweak {
-      (view: CheckBox) => {
-        view.setChecked(crime.solved)
-      }
-    } <~ Tweak {
-      (view: CheckBox) => {
-        view.setOnCheckedChangeListener(
-          new OnCheckedChangeListener() {
-            override def onCheckedChanged(
-                                           buttonView: CompoundButton, isChecked: Boolean) {
-              crime.solved = isChecked
-            }
-          })
-      }
-    }
+    val details = w[TextView] <~
+      text("Details") <~
+      matchWidth <~
+      listSeperator
 
-    val portaitLayout = getUi {
+    val dateButton = w[Button] <~
+      text(crime.mDate.toString) <~
+      disable
+
+    val checkBox = w[CheckBox] <~
+      text("Crime solved") <~
+      wire(checkBoxCrimeResolved) <~
+      Tweak {
+        (view: CheckBox) => {
+          view.setChecked(crime.solved)
+        }
+      } <~
+      Tweak {
+        (view: CheckBox) => {
+          view.setOnCheckedChangeListener(
+            new OnCheckedChangeListener() {
+              override def onCheckedChanged(
+                                             buttonView: CompoundButton, isChecked: Boolean) {
+                crime.solved = isChecked
+              }
+            })
+        }
+      }
+
+    val portraitLayout = getUi {
       l[LinearLayout](
         title,
         crimeInfo,
         details,
-        dateButton <~ margin(MATCH_PARENT,
-          WRAP_CONTENT)(left = 16 dp, right = 16 dp),
-        checkBox <~ margin(MATCH_PARENT,
-          WRAP_CONTENT)(left = 16 dp, right = 16 dp)) <~ vertical <~ matchWidth
+        dateButton <~
+          margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp),
+        checkBox <~
+          margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp)) <~
+        vertical <~ matchWidth
     }
 
     val landscapeLayout = getUi {
@@ -140,30 +152,29 @@ with Contexts[Fragment] {
         crimeInfo,
         details,
         l[LinearLayout](
-          dateButton <~ lp[LinearLayout](0 dp,
-            WRAP_CONTENT, 1.0f),
-          checkBox <~ lp[LinearLayout](0 dp,
-            WRAP_CONTENT, 1.0f)) <~ horizontal <~ matchWidth) <~ vertical <~ matchWidth
+          dateButton <~
+            lp[LinearLayout](0 dp, WRAP_CONTENT, 1.0f),
+          checkBox <~
+            lp[LinearLayout](0 dp, WRAP_CONTENT, 1.0f)) <~
+          horizontal <~ matchWidth) <~
+        vertical <~ matchWidth
     }
 
-    if(NavUtils.getParentActivityName(getActivity)!=null){
-    getActivity().getActionBar().setDisplayHomeAsUpEnabled(true)
+    if (NavUtils.getParentActivityName(getActivity) != null) {
+      getActivity().getActionBar().setDisplayHomeAsUpEnabled(true)
     }
 
     setHasOptionsMenu(true)
 
-    if (portrait) portaitLayout else landscapeLayout
+    if (portrait) portraitLayout else landscapeLayout
   }
 
   override def onOptionsItemSelected(item: MenuItem): Boolean = {
     item.getItemId match {
       case android.R.id.home => {
-        if(NavUtils.getParentActivityName(getActivity)!=null){
+        if (NavUtils.getParentActivityName(getActivity) != null) {
           NavUtils.navigateUpFromSameTask(getActivity)
         }
-        /*val intent = new Intent(getActivity, classOf[CrimeListActivity])
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)*/
         true
       }
       case _ => super.onOptionsItemSelected(item)

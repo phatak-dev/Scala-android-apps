@@ -79,22 +79,29 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
     getActivity().setTitle("List of crimes")
     crimes = CrimeLab(getActivity).getCrimes
     var checkBox = slot[CheckBox]
+
     def layout = getUi {
       l[RelativeLayout](
-        w[CheckBox] <~ wire(checkBox)
-          <~ Tweak {
-          (view: CheckBox) => view.setGravity(Gravity.CENTER)
-        } <~
-          padding(all = 4 dp) <~ id(Id.checkBox) <~ Tweak {
-          (view: CheckBox) => {
-            val layoutParams = new RelativeLayout.LayoutParams(WRAP_CONTENT,
-              MATCH_PARENT)
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-            view.setLayoutParams(layoutParams)
-          }
-        } <~ disable <~ Tweak {
-          (view: CheckBox) => view.setFocusable(false)
-        },
+        w[CheckBox] <~
+          wire(checkBox) <~
+          Tweak {
+            (view: CheckBox) => view.setGravity(Gravity.CENTER)
+          } <~
+          padding(all = 4 dp) <~
+          id(Id.checkBox) <~
+          Tweak {
+            (view: CheckBox) => {
+              val layoutParams = new RelativeLayout.LayoutParams(WRAP_CONTENT,
+                MATCH_PARENT)
+              layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+              view.setLayoutParams(layoutParams)
+            }
+          } <~
+          disable <~
+          Tweak {
+            (view: CheckBox) => view.setFocusable(false)
+          },
+
         w[TextView] <~ Tweak {
           (view: View) => {
             val layout = new RelativeLayout.LayoutParams(
@@ -103,7 +110,9 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
               Id.checkBox)
             view.setLayoutParams(layout)
           }
-        } <~ TextTweaks.bold <~ id(Id.crimeText) <~
+        } <~
+          TextTweaks.bold <~
+          id(Id.crimeText) <~
           padding(left = 4 dp, right = 4 dp),
 
         w[TextView] <~ Tweak {
@@ -116,10 +125,13 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
               Id.crimeText)
             view.setLayoutParams(layout)
           }
-        } <~ padding(left = 4 dp, right = 4 dp, top = 4 dp)
-          <~ id(Id.dateText)) <~ lp[android.widget.AbsListView](
-        MATCH_PARENT, WRAP_CONTENT)
+        } <~
+          padding(left = 4 dp, right = 4 dp, top = 4 dp) <~
+          id(Id.dateText)) <~
+        lp[android.widget.AbsListView](MATCH_PARENT, WRAP_CONTENT)
     }
+
+
     val customAdapter = new CustomAdapter(crimes, layout)
     setListAdapter(customAdapter)
     setHasOptionsMenu(true)
@@ -131,26 +143,37 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
     super.onCreateView(inflater, container, savedInstanceState)
     val emptyView = l[LinearLayout](
-      w[TextView] <~ text("No crimes in the list"),
-      w[Button] <~ text("Add crime") <~ On.click {
-        val crime = new Crime()
-        CrimeLab(getActivity).addCrime(crime)
-        val intent = new Intent(getActivity, classOf[CrimePagerActivity])
-        intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
-        startActivityForResult(intent, 0)
-        Ui(true)
-      } <~ lp[LinearLayout](WRAP_CONTENT,WRAP_CONTENT,Gravity.CENTER_HORIZONTAL)
-    ) <~ Tweak {
-      (view: View) => view.setId(android.R.id.empty)
-    } <~ vertical <~ lp[FrameLayout](WRAP_CONTENT,WRAP_CONTENT,Gravity.CENTER_HORIZONTAL |
-      Gravity.CENTER_VERTICAL)
+      w[TextView] <~
+        text("No crimes in the list"),
+
+      w[Button] <~
+        text("Add crime") <~
+        On.click {
+          val crime = new Crime()
+          CrimeLab(getActivity).addCrime(crime)
+          val intent = new Intent(getActivity, classOf[CrimePagerActivity])
+          intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
+          startActivityForResult(intent, 0)
+          Ui(true)
+        } <~
+        lp[LinearLayout](WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL)
+
+    ) <~
+      Tweak {
+        (view: View) => view.setId(android.R.id.empty)
+      } <~
+      vertical <~
+      lp[FrameLayout](WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL |
+        Gravity.CENTER_VERTICAL)
 
 
-    val listView = w[ListView] <~ matchParent <~ Tweak {
-      (view: ListView) => {
-        view.setId(android.R.id.list)
+    val listView = w[ListView] <~
+      matchParent <~
+      Tweak {
+        (view: ListView) => {
+          view.setId(android.R.id.list)
+        }
       }
-    }
 
     val layout = l[FrameLayout](
       listView,
@@ -180,8 +203,6 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
     val addCrimeMenuItem = menu.add("New crime")
     addCrimeMenuItem.onClick((item: MenuItem) => {
       d(tag, " on click called")
-      /*getUi{toast("menu item clicked") <~ gravity(Gravity.TOP | Gravity.CENTER_VERTICAL) <~ fry
-       }; true*/
       val crime = new Crime()
       CrimeLab(getActivity).addCrime(crime)
       val intent = new Intent(getActivity, classOf[CrimePagerActivity])

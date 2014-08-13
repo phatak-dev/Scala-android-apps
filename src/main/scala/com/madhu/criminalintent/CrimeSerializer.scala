@@ -4,7 +4,6 @@ import play.api.libs.json.Json
 import java.io._
 import android.content.Context
 import scala.io.Source
-import android.util.Log.d
 
 /**
  * Created by madhu on 12/8/14.
@@ -12,14 +11,14 @@ import android.util.Log.d
 class CrimeSerializer(fileName: String, context: Context) {
 
   def withOutputFile(op: => OutputStreamWriter => Unit) = {
-    var writer:OutputStreamWriter = null
+    var writer: OutputStreamWriter = null
     try {
       val out = context.openFileOutput(fileName, Context.MODE_PRIVATE)
       writer = new OutputStreamWriter(out)
       op(writer)
     }
     finally {
-      if (writer!=null) writer.close()
+      if (writer != null) writer.close()
     }
 
   }
@@ -44,7 +43,7 @@ class CrimeSerializer(fileName: String, context: Context) {
       }
     )
 
-    val crimeList = if (jsonString.isEmpty ) List[Crime]() else Json.parse(jsonString).as[List[Crime]]
+    val crimeList = if (jsonString.isEmpty) List[Crime]() else Json.parse(jsonString).as[List[Crime]]
     crimeList
   }
 
