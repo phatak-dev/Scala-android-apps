@@ -19,6 +19,7 @@ import android.view._
 import macroid.AppContext
 import android.view.ContextMenu.ContextMenuInfo
 import android.widget.AdapterView.AdapterContextMenuInfo
+import android.graphics.drawable.StateListDrawable
 
 
 trait MenuHelpers {
@@ -134,7 +135,14 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
         } <~
           padding(left = 4 dp, right = 4 dp, top = 4 dp) <~
           id(Id.dateText)) <~
-        lp[android.widget.AbsListView](MATCH_PARENT, WRAP_CONTENT)
+        lp[android.widget.AbsListView](MATCH_PARENT, WRAP_CONTENT) <~
+        Tweak((relativeLayout:RelativeLayout) => {
+          val stateListDrawable = new StateListDrawable()
+          stateListDrawable.addState(Array[Int](android.R.attr.state_activated),
+            getResources.getDrawable(android.R.color.darker_gray))
+          relativeLayout.setBackground(stateListDrawable)
+        })
+
     }
 
 
