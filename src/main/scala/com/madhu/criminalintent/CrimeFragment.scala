@@ -16,11 +16,13 @@ import android.content.Intent
 import com.madhu.criminalintent.camera.{CrimeCameraFragment, CrimeCameraActivity}
 import android.content.pm.PackageManager
 import android.app.Activity
+import android.widget.ImageView.ScaleType
 
 
 // import macroid stuff
 
 import macroid._
+import macroid.Ui._
 import macroid.FullDsl._
 import macroid.contrib.LpTweaks._
 import macroid.contrib._
@@ -65,6 +67,8 @@ with Contexts[Fragment] {
   var crime: Crime = _
   var editText = slot[EditText]
   var checkBoxCrimeResolved = slot[CheckBox]
+  var imageViewSlot = slot[ImageView]
+  var photoButton = slot[ImageButton]
 
   override def onCreate(savedBundleInstance: Bundle) = {
     super.onCreate(savedBundleInstance)
@@ -72,6 +76,8 @@ with Contexts[Fragment] {
       CrimeFragment.EXTRA_CRIME_ID).asInstanceOf[UUID]
     crime = CrimeLab(getActivity).getCrime(crimeId).get
   }
+
+
 
   override def onCreateView(inflator: LayoutInflater,
                             parent: ViewGroup, savedBundleInstance: Bundle): View = {
@@ -140,17 +146,34 @@ with Contexts[Fragment] {
       Tweak((view: ImageButton) => view.setBackgroundResource(android.R.drawable.ic_menu_camera)) <~
       On.click {
         val intent = new Intent(getActivity, classOf[CrimeCameraActivity])
-        startActivityForResult(intent,CrimeFragment.REQUEST_PHOTO)
+        startActivityForResult(intent, CrimeFragment.REQUEST_PHOTO)
         Ui(true)
-      }
+      } <~ wire(photoButton)
+
+    val imageView = w[ImageView] <~
+      lp[LinearLayout](80 dp, 80 dp) <~
+      Tweak {
+        (view: ImageView) => {
+          view.setScaleType(ScaleType.CENTER_INSIDE)
+          view.setBackground(getResources.getDrawable(android.R.color.darker_gray))
+          view.setCropToPadding(true)
+          if(!crime.imageFileName.isEmpty) {
+           val fullPath = getActivity.getFileStreamPath(crime.imageFileName).getAbsolutePath
+           val drawable = PictureUtils.getScaledDrawable(getActivity,fullPath)
+           view.setImageDrawable(drawable)
+          }
+        }
+      } <~ wire(imageViewSlot)
 
     //check do we have camera
 
     val pm = getActivity.getPackageManager
     val hasCamera = pm.hasSystemFeature(PackageManager.FEATURE_CAMERA) ||
-        pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
-    if(!hasCamera) {
-       getUi{ imageButton <~ disable}
+      pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
+    if (!hasCamera) {
+      getUi {
+        imageButton <~ disable
+      }
     }
 
     val portraitLayout = getUi {
@@ -162,7 +185,8 @@ with Contexts[Fragment] {
           margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp),
         checkBox <~
           margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp),
-        imageButton) <~
+        imageButton,
+        imageView) <~
         vertical <~ matchWidth
     }
 
@@ -178,7 +202,8 @@ with Contexts[Fragment] {
             lp[LinearLayout](0 dp, WRAP_CONTENT, 1.0f)
         ) <~
           horizontal <~ matchWidth,
-        imageButton) <~
+        imageButton,
+        imageView) <~
         vertical <~ matchWidth
     }
 
@@ -209,17 +234,22 @@ with Contexts[Fragment] {
   }
 
   override def onActivityResult(requestCode: Int, resultCode: Int, data: Intent): Unit = {
-    d("the result code is", ""+resultCode)
+    d("the result code is", "" + resultCode)
 
     super.onActivityResult(requestCode, resultCode, data)
-    if(resultCode == Activity.RESULT_OK) {
-        requestCode match {
-      case CrimeFragment.REQUEST_PHOTO => {
-        val fileName = data.getStringExtra(CrimeCameraFragment.imageFileKey)
-        crime.imageFileName = fileName
-        d("filename is got ",fileName)
+    if (resultCode == Activity.RESULT_OK) {
+      requestCode match {
+        case CrimeFragment.REQUEST_PHOTO => {
+          val fileName = data.getStringExtra(CrimeCameraFragment.imageFileKey)
+          crime.imageFileName = fileName
+          d("filename is got ", fileName)
+        }
       }
     }
   }
-}
+
+  override def onStop(): Unit = {
+    super.onStop()
+    PictureUtils.cleanUpImage(imageViewSlot)
+  }
 }
