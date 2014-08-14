@@ -1,14 +1,7 @@
 package com.madhu.criminalintent
 
 import android.os.Bundle
-import android.widget.{
-LinearLayout,
-TextView,
-Button,
-EditText,
-CheckBox
-}
-import android.widget.CompoundButton
+import android.widget._
 import android.widget.CompoundButton._
 import android.view.ViewGroup.LayoutParams._
 import android.view._
@@ -17,6 +10,13 @@ import android.support.v4.app._
 import java.util.UUID
 import android.text.TextWatcher
 import android.text.Editable
+import android.util.Log.d
+
+import android.content.Intent
+import com.madhu.criminalintent.camera.CrimeCameraActivity
+import android.content.pm.PackageManager
+import android.hardware.Camera
+
 
 // import macroid stuff
 
@@ -134,6 +134,24 @@ with Contexts[Fragment] {
         }
       }
 
+    val imageButton = w[ImageButton] <~
+      wrapContent <~
+      Tweak((view: ImageButton) => view.setBackgroundResource(android.R.drawable.ic_menu_camera)) <~
+      On.click {
+        val intent = new Intent(getActivity, classOf[CrimeCameraActivity])
+        startActivity(intent)
+        Ui(true)
+      }
+
+    //check do we have camera
+
+    val pm = getActivity.getPackageManager
+    val hasCamera = pm.hasSystemFeature(PackageManager.FEATURE_CAMERA) ||
+        pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
+    if(!hasCamera) {
+       getUi{ imageButton <~ disable}
+    }
+
     val portraitLayout = getUi {
       l[LinearLayout](
         title,
@@ -142,7 +160,8 @@ with Contexts[Fragment] {
         dateButton <~
           margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp),
         checkBox <~
-          margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp)) <~
+          margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp),
+        imageButton) <~
         vertical <~ matchWidth
     }
 
@@ -155,8 +174,10 @@ with Contexts[Fragment] {
           dateButton <~
             lp[LinearLayout](0 dp, WRAP_CONTENT, 1.0f),
           checkBox <~
-            lp[LinearLayout](0 dp, WRAP_CONTENT, 1.0f)) <~
-          horizontal <~ matchWidth) <~
+            lp[LinearLayout](0 dp, WRAP_CONTENT, 1.0f)
+        ) <~
+          horizontal <~ matchWidth,
+        imageButton) <~
         vertical <~ matchWidth
     }
 
