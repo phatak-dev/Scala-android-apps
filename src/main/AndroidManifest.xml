@@ -34,6 +34,7 @@
                        android:value=".CrimeListActivity" />
         </activity>
         <activity android:name=".camera.CrimeCameraActivity"
+                  android:exported="true"
                   android:screenOrientation="landscape"
                   android:label="Camera">
         </activity>
