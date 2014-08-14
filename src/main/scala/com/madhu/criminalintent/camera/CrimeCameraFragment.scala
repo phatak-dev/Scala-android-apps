@@ -1,10 +1,10 @@
 package com.madhu.criminalintent.camera
 
 import android.support.v4.app.Fragment
-import macroid.{IdGeneration, Ui, Contexts}
+import macroid.{Tweak, IdGeneration, Ui, Contexts}
 import android.view._
 import android.os.Bundle
-import android.widget.{Button, LinearLayout, FrameLayout}
+import android.widget.{ProgressBar, Button, LinearLayout, FrameLayout}
 import android.view.ViewGroup.LayoutParams._
 
 
@@ -13,17 +13,29 @@ import macroid.FullDsl._
 import macroid.contrib.LpTweaks._
 import android.hardware.Camera
 import android.view.SurfaceHolder.Callback
-
+import android.widget.FrameLayout.LayoutParams
+import android.hardware.Camera.{PictureCallback, ShutterCallback}
+import java.util.UUID
+import java.io.FileOutputStream
+import android.content.{Intent, Context}
+import android.util.Log.d
+import android.app.Activity
 
 
 /**
  *
  * Created by madhu on 14/8/14.
+ *
  */
+object CrimeCameraFragment{
+  val imageFileKey="com.madhu.criminalintent.camera.ImageFileName"
+}
+
 class CrimeCameraFragment extends Fragment
 with Contexts[Fragment] with IdGeneration{
   var mCamera:Option[Camera] = _
   var surfaceView = slot[SurfaceView]
+  var progressBar = slot[ProgressBar]
 
   override def onActivityCreated(savedInstanceState: Bundle): Unit = {
     super.onActivityCreated(savedInstanceState)
@@ -67,12 +79,56 @@ with Contexts[Fragment] with IdGeneration{
        matchHeight <~
 
       On.click {
-        getActivity.finish()
+        val shutterCallBack = new ShutterCallback {
+          override def onShutter(): Unit = {
+            getUi { progressBar <~ show }
+          }
+        }
+
+        val mJpegCallback = new PictureCallback {
+          def onPictureTaken(data:Array[Byte],camera:Camera) = {
+            val fileName = UUID.randomUUID().toString+".jpg"
+            var success = true
+            var os:FileOutputStream = null
+            try {
+              os = getActivity.openFileOutput(fileName,Context.MODE_PRIVATE)
+              os.write(data)
+            }
+            catch {
+              case e:Exception => d("$$$$$$$$$44","somethingwent wrong",e) ; success = false
+            }
+            finally {
+              if(os!=null) os.close()
+              success=true
+            }
+            if(success) {
+              d("$$$$$$$$$$","saved fine")
+              val intent = new Intent()
+              intent.putExtra(CrimeCameraFragment.imageFileKey,fileName)
+              getActivity.setResult(Activity.RESULT_OK,intent)
+            }
+            else {
+              getActivity.setResult(Activity.RESULT_CANCELED)
+            }
+            getActivity.finish()
+          }
+        }
+
+        mCamera.map(camera => {
+          camera.takePicture(shutterCallBack,null,mJpegCallback)
+        })
+
         Ui(true)
       }
 
-      ) <~ matchParent
-    ) <~ matchParent
+      ) <~ matchParent ,
+     w[ProgressBar] <~ Tweak((view:View) => {
+       val layoutParams = new LayoutParams(WRAP_CONTENT,WRAP_CONTENT)
+       layoutParams.gravity = Gravity.CENTER
+       view.setLayoutParams(layoutParams)
+     }) <~ wire(progressBar) <~ hide
+    ) <~ matchParent <~
+    Tweak((view:View) => view.setClickable(true))
 
     getUi(layout)
   }

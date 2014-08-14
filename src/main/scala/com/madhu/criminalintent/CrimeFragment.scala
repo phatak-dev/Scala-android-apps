@@ -13,9 +13,9 @@ import android.text.Editable
 import android.util.Log.d
 
 import android.content.Intent
-import com.madhu.criminalintent.camera.CrimeCameraActivity
+import com.madhu.criminalintent.camera.{CrimeCameraFragment, CrimeCameraActivity}
 import android.content.pm.PackageManager
-import android.hardware.Camera
+import android.app.Activity
 
 
 // import macroid stuff
@@ -49,6 +49,7 @@ trait CustomTweaks {
 
 object CrimeFragment {
   val EXTRA_CRIME_ID = "com.madhu.criminalintent.CrimeFragment.ID"
+  val REQUEST_PHOTO = 1
 
   def newInstance(uuid: UUID): CrimeFragment = {
     val argsBundle = new Bundle()
@@ -139,7 +140,7 @@ with Contexts[Fragment] {
       Tweak((view: ImageButton) => view.setBackgroundResource(android.R.drawable.ic_menu_camera)) <~
       On.click {
         val intent = new Intent(getActivity, classOf[CrimeCameraActivity])
-        startActivity(intent)
+        startActivityForResult(intent,CrimeFragment.REQUEST_PHOTO)
         Ui(true)
       }
 
@@ -206,4 +207,19 @@ with Contexts[Fragment] {
     super.onPause()
     CrimeLab(getActivity).saveCrimes()
   }
+
+  override def onActivityResult(requestCode: Int, resultCode: Int, data: Intent): Unit = {
+    d("the result code is", ""+resultCode)
+
+    super.onActivityResult(requestCode, resultCode, data)
+    if(resultCode == Activity.RESULT_OK) {
+        requestCode match {
+      case CrimeFragment.REQUEST_PHOTO => {
+        val fileName = data.getStringExtra(CrimeCameraFragment.imageFileKey)
+        crime.imageFileName = fileName
+        d("filename is got ",fileName)
+      }
+    }
+  }
+}
 }
