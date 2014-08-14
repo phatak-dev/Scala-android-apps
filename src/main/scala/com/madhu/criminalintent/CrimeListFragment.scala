@@ -1,7 +1,7 @@
 package com.madhu.criminalintent
 
 import android.support.v4.app._
-import android.os.Bundle
+import android.os.{Build, Bundle}
 import android.widget._
 import android.view.ViewGroup.LayoutParams._
 
@@ -159,8 +159,10 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
 
   override def onActivityCreated(savedInstanceState: Bundle): Unit = {
     d(tag,"activity created")
-    //registerForContextMenu(this.getListView)
 
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+      registerForContextMenu(this.getListView)
+    } else {
     this.getListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL)
     this.getListView.findViewById(android.R.id.list).asInstanceOf[ListView].setMultiChoiceModeListener(new MultiChoiceModeListener {
 
@@ -200,6 +202,7 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
       }
 
     })
+    }
 
 
 
