@@ -9,7 +9,8 @@ import play.api.libs.json.Json
  */
 case class Crime(var uuid: UUID = UUID.randomUUID(),
                  var mTitle: String = "",
-                 var mDate: Date = new Date(), var solved: Boolean = false)
+                 var mDate: Date = new Date(), var solved: Boolean = false,
+                  var imageFileName:String = "")
 object Crime{
   //implicit reader and writers for the play-json
   implicit val crimeWriters = Json.writes[Crime]

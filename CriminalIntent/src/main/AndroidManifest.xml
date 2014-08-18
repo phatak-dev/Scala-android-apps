@@ -5,7 +5,10 @@
 
     <uses-sdk
         android:minSdkVersion="9"
-        android:targetSdkVersion="19"/>            
+        android:targetSdkVersion="19"/>
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
 
     <application
         android:label="CriminalIntent" 
@@ -29,6 +32,11 @@
           android:name=".CrimePagerActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
                        android:value=".CrimeListActivity" />
+        </activity>
+        <activity android:name=".camera.CrimeCameraActivity"
+                  android:exported="true"
+                  android:screenOrientation="landscape"
+                  android:label="Camera">
         </activity>
     </application>
 </manifest>
