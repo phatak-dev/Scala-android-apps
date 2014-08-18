@@ -1,0 +1,34 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.madhu.criminalintent"
+    android:versionCode="0"
+    android:versionName="0.1">
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="19"/>            
+
+    <application
+        android:label="CriminalIntent" 
+        android:background="@android:color/white"        
+        android:icon="@drawable/android:star_big_on"
+        android:theme="@android:style/Theme.Holo.Light">
+
+        <activity android:name=".CrimeListActivity">
+        <intent-filter>
+         <action android:name="android.intent.action.MAIN" />
+           <category android:name="android.intent.category.LAUNCHER" />
+         </intent-filter>
+        </activity>
+        <activity
+          android:label="CriminalIntent"
+          android:name=".CriminalActivity"
+          >
+        </activity>        
+        <activity
+          android:label="CriminalIntentPage"
+          android:name=".CrimePagerActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value=".CrimeListActivity" />
+        </activity>
+    </application>
+</manifest>
