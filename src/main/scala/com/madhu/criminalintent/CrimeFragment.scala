@@ -17,6 +17,7 @@ import com.madhu.criminalintent.camera.{CrimeCameraFragment, CrimeCameraActivity
 import android.content.pm.PackageManager
 import android.app.Activity
 import android.widget.ImageView.ScaleType
+import com.madhu.criminalintent.camera.ImageFragement
 
 
 // import macroid stuff
@@ -163,7 +164,15 @@ with Contexts[Fragment] {
            view.setImageDrawable(drawable)
           }
         }
-      } <~ wire(imageViewSlot)
+      } <~ wire(imageViewSlot)  <~
+       On.click {
+         if(!crime.imageFileName.isEmpty) {
+           val fragmentManager = getActivity.getSupportFragmentManager
+           val path = getActivity.getFileStreamPath(crime.imageFileName).getAbsolutePath
+           ImageFragement.newInstance(path).show(fragmentManager,"image")
+         }
+         Ui(true)
+       }
 
     //check do we have camera
 
