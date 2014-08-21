@@ -227,9 +227,7 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
         On.click {
           val crime = new Crime()
           CrimeLab(getActivity).addCrime(crime)
-          val intent = new Intent(getActivity, classOf[CrimePagerActivity])
-          intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
-          startActivityForResult(intent, 0)
+          callBacks.map(callBack => callBack.onCrime(crime))
           Ui(true)
         } <~
         lp[LinearLayout](WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL)
@@ -262,11 +260,6 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
   override def onListItemClick(l: ListView, v: View, position: Int, id: Long) = {
     val crime = getListAdapter().getItem(position).
       asInstanceOf[Crime]
-    /*import android.content.Intent
-    val intent = new Intent(getActivity(), classOf[
-      CrimePagerActivity])
-    intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
-    startActivity(intent)*/
     callBacks.map(callBack => callBack.onCrime(crime))
   }
 
@@ -287,9 +280,7 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
       d(tag, " on click called")
       val crime = new Crime()
       CrimeLab(getActivity).addCrime(crime)
-      val intent = new Intent(getActivity, classOf[CrimePagerActivity])
-      intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
-      startActivityForResult(intent, 0)
+      callBacks.map(callBack => callBack.onCrime(crime))
       true
     })
 
