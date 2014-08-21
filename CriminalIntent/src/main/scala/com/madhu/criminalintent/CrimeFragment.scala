@@ -16,16 +16,13 @@ import android.content.Intent
 import com.madhu.criminalintent.camera.{CrimeCameraFragment, CrimeCameraActivity}
 import android.content.pm.PackageManager
 import android.app.Activity
-import android.widget.ImageView.ScaleType
 import com.madhu.criminalintent.camera.ImageFragement
 import android.provider.ContactsContract
-import macroid.AppContext
 
 
 // import macroid stuff
 
 import macroid._
-import macroid.Ui._
 import macroid.FullDsl._
 import macroid.contrib.LpTweaks._
 import macroid.contrib._
@@ -66,6 +63,9 @@ object CrimeFragment {
   }
 }
 
+
+
+
 class CrimeFragment extends Fragment with CustomTweaks
 with Contexts[Fragment] with IdGeneration {
   var crime: Crime = _
@@ -73,6 +73,7 @@ with Contexts[Fragment] with IdGeneration {
   var checkBoxCrimeResolved = slot[CheckBox]
   var imageViewSlot = slot[ImageView]
   var photoButton = slot[ImageButton]
+
 
   override def onCreate(savedBundleInstance: Bundle) = {
     super.onCreate(savedBundleInstance)
@@ -311,9 +312,7 @@ super.onStart ()
 showPhoto ()
 }
 
-
-
-override def onStop (): Unit = {
+  override def onStop (): Unit = {
 super.onStop ()
 PictureUtils.cleanUpImage (imageViewSlot.get)
 }

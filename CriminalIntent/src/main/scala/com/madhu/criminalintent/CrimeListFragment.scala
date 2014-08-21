@@ -20,6 +20,7 @@ import macroid.AppContext
 import android.view.ContextMenu.ContextMenuInfo
 import android.widget.AdapterView.AdapterContextMenuInfo
 import android.graphics.drawable.StateListDrawable
+import android.app.Activity
 
 
 trait MenuHelpers {
@@ -40,12 +41,17 @@ trait MenuHelpers {
 
 }
 
+trait CallBacks {
+  def onCrime(crime:Crime)
+}
+
 
 class CrimeListFragment extends ListFragment
 with Contexts[ListFragment] with IdGeneration with MenuHelpers {
 
   val tag = "com.madhu.criminalintent.CrimeListFragment.Tag"
   var crimes: List[Crime] = _
+  var callBacks:Option[CallBacks] = None
 
   class CustomAdapter(layout: => View,var crimes:List[Crime])
     extends BaseAdapter{
@@ -256,11 +262,12 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
   override def onListItemClick(l: ListView, v: View, position: Int, id: Long) = {
     val crime = getListAdapter().getItem(position).
       asInstanceOf[Crime]
-    import android.content.Intent
+    /*import android.content.Intent
     val intent = new Intent(getActivity(), classOf[
       CrimePagerActivity])
     intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.uuid)
-    startActivity(intent)
+    startActivity(intent)*/
+    callBacks.map(callBack => callBack.onCrime(crime))
   }
 
 
@@ -319,4 +326,16 @@ with Contexts[ListFragment] with IdGeneration with MenuHelpers {
     })
     super.onCreateContextMenu(menu, v, menuInfo)
   }
+
+  override def onAttach(activity: Activity): Unit = {
+    super.onAttach(activity)
+    callBacks = Some(getActivity.asInstanceOf[CallBacks])
+  }
+
+
+  override def onDetach(): Unit = {
+    super.onDetach()
+    callBacks = None
+  }
+
 }
