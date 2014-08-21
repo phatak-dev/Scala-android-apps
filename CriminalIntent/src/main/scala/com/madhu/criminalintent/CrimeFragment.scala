@@ -18,6 +18,8 @@ import android.content.pm.PackageManager
 import android.app.Activity
 import android.widget.ImageView.ScaleType
 import com.madhu.criminalintent.camera.ImageFragement
+import android.provider.ContactsContract
+import macroid.AppContext
 
 
 // import macroid stuff
@@ -53,6 +55,7 @@ trait CustomTweaks {
 object CrimeFragment {
   val EXTRA_CRIME_ID = "com.madhu.criminalintent.CrimeFragment.ID"
   val REQUEST_PHOTO = 1
+  val REQUEST_CONTACT = 2
 
   def newInstance(uuid: UUID): CrimeFragment = {
     val argsBundle = new Bundle()
@@ -64,7 +67,7 @@ object CrimeFragment {
 }
 
 class CrimeFragment extends Fragment with CustomTweaks
-with Contexts[Fragment] {
+with Contexts[Fragment] with IdGeneration {
   var crime: Crime = _
   var editText = slot[EditText]
   var checkBoxCrimeResolved = slot[CheckBox]
@@ -77,7 +80,6 @@ with Contexts[Fragment] {
       CrimeFragment.EXTRA_CRIME_ID).asInstanceOf[UUID]
     crime = CrimeLab(getActivity).getCrime(crimeId).get
   }
-
 
 
   override def onCreateView(inflator: LayoutInflater,
@@ -153,34 +155,35 @@ with Contexts[Fragment] {
 
     val imageView = w[ImageView] <~
       lp[LinearLayout](80 dp, 80 dp) <~
-      Tweak {
-        (view: ImageView) => {
-          view.setScaleType(ScaleType.CENTER_INSIDE)
-          view.setBackground(getResources.getDrawable(android.R.color.darker_gray))
-          view.setCropToPadding(true)
-          if(!crime.imageFileName.isEmpty) {
-           val fullPath = getActivity.getFileStreamPath(crime.imageFileName).getAbsolutePath
-           val drawable = PictureUtils.getScaledDrawable(getActivity,fullPath)
-           view.setImageDrawable(drawable)
-          }
+      wire(imageViewSlot) <~
+      On.click {
+        if (!crime.imageFileName.isEmpty) {
+          val fragmentManager = getActivity.getSupportFragmentManager
+          val path = getActivity.getFileStreamPath(crime.imageFileName).getAbsolutePath
+          ImageFragement.newInstance(path).show(fragmentManager, "image")
         }
-      } <~ wire(imageViewSlot)  <~
-       On.click {
-         if(!crime.imageFileName.isEmpty) {
-           val fragmentManager = getActivity.getSupportFragmentManager
-           val path = getActivity.getFileStreamPath(crime.imageFileName).getAbsolutePath
-           ImageFragement.newInstance(path).show(fragmentManager,"image")
-         }
-         Ui(true)
-       }
+        Ui(true)
+      } <~ id(Id.imageViewId)
 
 
     val suspectButton = w[Button] <~
-     text("Choose suspect")
+      text("Choose suspect") <~ On.click {
+      val intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+      startActivityForResult(intent, CrimeFragment.REQUEST_CONTACT)
+      Ui(true)
+    } <~ id(Id.suspectButton)
+
 
 
     val reportButton = w[Button] <~
-      text("Report crime")
+      text("Report crime") <~ On.click {
+      val intent = new Intent(Intent.ACTION_SEND)
+      intent.setType("text/plain")
+      intent.putExtra(Intent.EXTRA_TEXT, Crime.getCrimeReport(crime))
+      intent.putExtra(Intent.EXTRA_SUBJECT, "crime report")
+      startActivity(Intent.createChooser(intent, "Send crime report"))
+      Ui(true)
+    }
 
 
 
@@ -206,8 +209,8 @@ with Contexts[Fragment] {
           margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp),
         imageButton,
         imageView,
-        suspectButton <~ margin(MATCH_PARENT,WRAP_CONTENT)(left = 16 dp ,right = 16 dp),
-        reportButton  <~ margin(MATCH_PARENT,WRAP_CONTENT)(left = 16 dp ,right = 16 dp)) <~
+        suspectButton <~ margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp),
+        reportButton <~ margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp)) <~
         vertical <~ matchWidth
     }
 
@@ -226,10 +229,10 @@ with Contexts[Fragment] {
         imageButton,
         imageView,
         l[LinearLayout](
-          suspectButton <~ lp[LinearLayout](WRAP_CONTENT,WRAP_CONTENT,1),
-          reportButton <~ lp[LinearLayout](WRAP_CONTENT,WRAP_CONTENT,1)
-        ) <~ horizontal <~ margin(MATCH_PARENT,WRAP_CONTENT)(left=16 dp , right = 16 dp)
-        ) <~
+          suspectButton <~ lp[LinearLayout](WRAP_CONTENT, WRAP_CONTENT, 1),
+          reportButton <~ lp[LinearLayout](WRAP_CONTENT, WRAP_CONTENT, 1)
+        ) <~ horizontal <~ margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp)
+      ) <~
         vertical <~ matchWidth) <~ matchParent
     }
 
@@ -269,13 +272,49 @@ with Contexts[Fragment] {
           val fileName = data.getStringExtra(CrimeCameraFragment.imageFileKey)
           crime.imageFileName = fileName
           d("filename is got ", fileName)
+          showPhoto()
+        }
+        case CrimeFragment.REQUEST_CONTACT => {
+          val uri = data.getData
+          val cursor = getActivity.getContentResolver.query(
+            uri, Array[String](ContactsContract.ContactsColumns.DISPLAY_NAME), null, null, null)
+          if (cursor.getCount > 0) {
+            cursor.moveToFirst()
+            val suspect = cursor.getString(0)
+            crime.suspect = suspect
+            getActivity.setTitle(crime.suspect)
+            getUi { getView.find[Button](Id.suspectButton) <~ text(crime.suspect) }
+            d("$$$$$$$$$$$", s"suspect name is $suspect")
+          }
+          cursor.close()
         }
       }
     }
   }
 
-  override def onStop(): Unit = {
-    super.onStop()
-    PictureUtils.cleanUpImage(imageViewSlot.get)
+
+  def showPhoto() = {
+    d("$$$$$$$$$", "show photo called")
+    getUi {getView.find[ImageView](Id.imageViewId) <~ Tweak{ imageView:ImageView => {
+    val path = crime.imageFileName
+    if (path != null && !path.isEmpty) {
+      val fullPath = getActivity()
+        .getFileStreamPath(path).getAbsolutePath()
+      d("$$$$$$$$$", "setting image")
+      imageView.setImageDrawable(PictureUtils.getScaledDrawable(getActivity, fullPath))
+    }}}}
   }
+
+
+override def onStart (): Unit = {
+super.onStart ()
+showPhoto ()
+}
+
+
+
+override def onStop (): Unit = {
+super.onStop ()
+PictureUtils.cleanUpImage (imageViewSlot.get)
+}
 }
