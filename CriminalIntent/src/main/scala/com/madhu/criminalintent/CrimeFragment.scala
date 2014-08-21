@@ -259,6 +259,6 @@ with Contexts[Fragment] {
 
   override def onStop(): Unit = {
     super.onStop()
-    PictureUtils.cleanUpImage(imageViewSlot)
+    PictureUtils.cleanUpImage(imageViewSlot.get)
   }
 }

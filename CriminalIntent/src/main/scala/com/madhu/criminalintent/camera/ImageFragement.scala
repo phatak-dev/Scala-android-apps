@@ -19,7 +19,7 @@ with Contexts[DialogFragment] {
 
   override def onStop(): Unit = {
     super.onStop()
-    PictureUtils.cleanUpImage(imageViewSlot)
+    PictureUtils.cleanUpImage(imageViewSlot.get)
   }
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
