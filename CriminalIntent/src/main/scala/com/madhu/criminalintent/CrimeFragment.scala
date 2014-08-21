@@ -174,6 +174,16 @@ with Contexts[Fragment] {
          Ui(true)
        }
 
+
+    val suspectButton = w[Button] <~
+     text("Choose suspect")
+
+
+    val reportButton = w[Button] <~
+      text("Report crime")
+
+
+
     //check do we have camera
 
     val pm = getActivity.getPackageManager
@@ -195,12 +205,14 @@ with Contexts[Fragment] {
         checkBox <~
           margin(MATCH_PARENT, WRAP_CONTENT)(left = 16 dp, right = 16 dp),
         imageButton,
-        imageView) <~
+        imageView,
+        suspectButton <~ margin(MATCH_PARENT,WRAP_CONTENT)(left = 16 dp ,right = 16 dp),
+        reportButton  <~ margin(MATCH_PARENT,WRAP_CONTENT)(left = 16 dp ,right = 16 dp)) <~
         vertical <~ matchWidth
     }
 
     val landscapeLayout = getUi {
-      l[LinearLayout](
+      l[ScrollView](l[LinearLayout](
         title,
         crimeInfo,
         details,
@@ -212,8 +224,13 @@ with Contexts[Fragment] {
         ) <~
           horizontal <~ matchWidth,
         imageButton,
-        imageView) <~
-        vertical <~ matchWidth
+        imageView,
+        l[LinearLayout](
+          suspectButton <~ lp[LinearLayout](WRAP_CONTENT,WRAP_CONTENT,1),
+          reportButton <~ lp[LinearLayout](WRAP_CONTENT,WRAP_CONTENT,1)
+        ) <~ horizontal <~ margin(MATCH_PARENT,WRAP_CONTENT)(left=16 dp , right = 16 dp)
+        ) <~
+        vertical <~ matchWidth) <~ matchParent
     }
 
     if (NavUtils.getParentActivityName(getActivity) != null) {

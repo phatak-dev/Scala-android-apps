@@ -33,7 +33,7 @@ class CrimePagerActivity extends FragmentActivity with Contexts[FragmentActivity
     control its height manually*/
     val layoutParams = new FrameLayout.LayoutParams(
       MATCH_PARENT, MATCH_PARENT, 1)
-    layoutParams.height = toPx(300)
+    layoutParams.height = toPx(400)
     viewPager.setLayoutParams(layoutParams)
 
     crimes = CrimeLab(this).getCrimes()
