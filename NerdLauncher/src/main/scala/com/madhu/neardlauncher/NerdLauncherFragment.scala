@@ -19,16 +19,26 @@ import android.support.v4.app._
 import android.view.LayoutInflater
 import android.util.Log
 import scala.collection.JavaConverters._
-import android.widget.{ListView, TextView, BaseAdapter, ArrayAdapter}
+import android.widget._
 import android.content.pm.ResolveInfo
 
 // import macroid stuff
 import macroid._
 class NerdLauncherFragment extends ListFragment
-  with Contexts[ListFragment] {
+  with Contexts[ListFragment] with IdGeneration{
   override def onCreate(savedBundleInstance: Bundle) = {
     super.onCreate(savedBundleInstance)
     
+  }
+
+  def layout = {
+    l[LinearLayout](
+      w[ImageView] <~ id(Id.appIcon) <~ padding( all = 4 dp),
+      w[TextView] <~
+      id(Id.applicationName) <~
+      padding( all = 4 dp) <~
+     Tweak{(view:TextView) => view.setTextSize(10 dp)}
+    )
   }
 
   class CustomerAdpater(val activities:List[ResolveInfo]) extends BaseAdapter{
@@ -36,11 +46,15 @@ class NerdLauncherFragment extends ListFragment
     override def getView(position: Int,
                          convertView: View, parent: ViewGroup): View = {
       val layoutView = if (convertView != null) convertView
-      else getUi{ w[TextView] <~ padding( all = 4 dp) <~ Tweak{(view:TextView) => view.setTextSize(10 dp)}}
+      else getUi{ layout}
 
       val pm = getActivity.getPackageManager
       val resolveInfo = activities(position)
-      layoutView.asInstanceOf[TextView].setText(resolveInfo.loadLabel(pm).toString)
+      val appName = layoutView.findViewById(Id.applicationName).asInstanceOf[TextView]
+      appName.setText(resolveInfo.loadLabel(pm).toString)
+
+      val appIcon = layoutView.findViewById(Id.appIcon).asInstanceOf[ImageView]
+      appIcon.setImageDrawable(resolveInfo.loadIcon(pm))
      layoutView
     }
 
