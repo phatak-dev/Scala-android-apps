@@ -37,7 +37,7 @@ Contexts[FragmentActivity] with IdGeneration {
   
   override def onCreate(savedInstanceState: Bundle) = {  
     super.onCreate(savedInstanceState)
-    val view = f[ProcessManagerFragment].framed(Id.map,Tag.map) <~
+    val view = f[NerdLauncherFragment].framed(Id.map,Tag.map) <~
     matchParent
     setContentView(getUi{view})
 }
