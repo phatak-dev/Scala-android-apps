@@ -1,0 +1,24 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.madhu.taskkiller"
+    android:versionCode="0"
+    android:versionName="0.1">
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="19"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+
+    <application
+        android:label="TaskKiller"         
+        android:icon="@drawable/android:star_big_on"
+        >
+
+        <activity android:name=".ProcessManagerActivity">
+        <intent-filter>
+         <action android:name="android.intent.action.MAIN" />
+           <category android:name="android.intent.category.LAUNCHER" />           
+         </intent-filter>
+        </activity>        
+    </application>
+</manifest>
